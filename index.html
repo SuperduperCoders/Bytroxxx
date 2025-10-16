@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bytrox - Ethical Hacking Learning Platform</title>
+    
+    <!-- SEO and Performance Meta Tags -->
+    <meta name="description" content="Learn ethical hacking through hands-on tutorials. Master cybersecurity with 14+ subjects, interactive tools, and step-by-step guidance. 100% ethical education.">
+    <meta name="keywords" content="ethical hacking, cybersecurity, penetration testing, security education, OSINT, vulnerability assessment">
+    <meta name="author" content="Bytrox">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Performance optimizations -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    
+    <!-- Critical CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Optimized font loading -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    
+    <!-- Theme color for mobile browsers -->
+    <meta name="theme-color" content="#00ff88">
+    <meta name="msapplication-TileColor" content="#0a0a0a">
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "EducationalOrganization",
+        "name": "Bytrox",
+        "description": "Ethical Hacking Learning Platform",
+        "url": "https://bytrox.com",
+        "courseMode": "online",
+        "educationalLevel": "beginner to advanced",
+        "subject": "Cybersecurity and Ethical Hacking"
+    }
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" role="banner">
+        <div class="container">
+            <div class="logo">
+                <h1>Bytrox</h1>
+                <span>Ethical Hacking Course</span>
+            </div>
+            <nav class="nav" role="navigation" aria-label="Main navigation">
+                <a href="#home" class="nav-link active" aria-current="page">Home</a>
+                <a href="#tools" class="nav-link">Tools</a>
+                <a href="#subjects" class="nav-link">Subjects</a>
+                <a href="#achievements" class="nav-link">Achievements</a>
+                <a href="#about" class="nav-link">About</a>
+                <div class="user-menu">
+                    <button class="user-profile-btn" onclick="toggleUserProfile()" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
+                        <div class="user-avatar" id="user-avatar" aria-hidden="true">👤</div>
+                        <span id="user-name">Guest</span>
+                    </button>
+                    <div class="user-dropdown" id="user-dropdown" style="display: none;" role="menu" aria-hidden="true">
+                        <div class="dropdown-item" onclick="openProfile()" role="menuitem" tabindex="0">👤 Profile</div>
+                        <div class="dropdown-item" onclick="openProgress()" role="menuitem" tabindex="0">📊 Progress</div>
+                        <div class="dropdown-item" onclick="openSettings()" role="menuitem" tabindex="0">⚙️ Settings</div>
+                        <div class="dropdown-item" onclick="toggleTheme()" role="menuitem" tabindex="0">🌓 Toggle Theme</div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Home Section -->
+        <section id="home" class="hero">
+            <div class="matrix-bg"></div>
+            <div class="container">
+                <div class="hero-content">
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <span class="terminal-dot red"></span>
+                            <span class="terminal-dot yellow"></span>
+                            <span class="terminal-dot green"></span>
+                            <span class="terminal-title">ethical-hacker@bytrox:~$</span>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="typed-text" id="typed-text"></span>
+                                <span class="cursor" id="cursor">|</span>
+                            </div>
+                            <div class="terminal-output" id="terminal-output" style="display: none;">
+                                <div class="output-line">Initializing Bytrox Learning Platform...</div>
+                                <div class="output-line">Loading ethical hacking modules... ✓</div>
+                                <div class="output-line">Establishing secure connection... ✓</div>
+                                <div class="output-line success">Welcome to the future of ethical hacking education!</div>
+                            </div>
+                        </div>
+                    </div>
+                    <h1 class="hero-title">Master Ethical Hacking</h1>
+                    <p class="hero-subtitle">Learn cybersecurity through hands-on, step-by-step tutorials designed for the next generation of ethical hackers</p>
+                    <div class="hero-buttons">
+                        <button class="cta-button primary" onclick="showSubjects()" title="Start your ethical hacking journey">
+                            <span>Start Learning</span>
+                            <i class="arrow">→</i>
+                        </button>
+                        <button class="cta-button secondary" onclick="scrollToAbout()" title="Learn more about our platform">
+                            <span>Learn More</span>
+                        </button>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat tooltip" data-tooltip="Comprehensive subjects covering all aspects of ethical hacking">
+                            <span class="stat-number">14</span>
+                            <span class="stat-label">Subjects</span>
+                        </div>
+                        <div class="stat tooltip" data-tooltip="Hands-on tutorial steps with practical examples">
+                            <span class="stat-number">200+</span>
+                            <span class="stat-label">Steps</span>
+                        </div>
+                        <div class="stat tooltip" data-tooltip="All content follows ethical hacking principles">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Ethical</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="about-section">
+            <div class="container">
+                <h2 class="section-title">About Bytrox</h2>
+                <div class="about-grid">
+                    <div class="about-card">
+                        <div class="about-icon">🎯</div>
+                        <h3>Our Mission</h3>
+                        <p>To democratize ethical hacking education through comprehensive, hands-on learning experiences that prepare the next generation of cybersecurity professionals.</p>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-icon">⚖️</div>
+                        <h3>Ethical Foundation</h3>
+                        <p>Everything we teach is grounded in ethical principles, legal compliance, and responsible disclosure. We believe knowledge should be used to protect, not harm.</p>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-icon">🚀</div>
+                        <h3>Cutting Edge</h3>
+                        <p>Our curriculum stays current with the latest threats, tools, and techniques used by cybersecurity professionals in the field.</p>
+                    </div>
+                </div>
+                
+                <div class="principles-section">
+                    <h3>Ethical Hacking Principles</h3>
+                    <div class="principles-grid">
+                        <div class="principle">
+                            <span class="principle-number">01</span>
+                            <div class="principle-content">
+                                <h4>Always Get Authorization</h4>
+                                <p>Never test systems you don't own or lack explicit permission to test.</p>
+                            </div>
+                        </div>
+                        <div class="principle">
+                            <span class="principle-number">02</span>
+                            <div class="principle-content">
+                                <h4>Minimize Impact</h4>
+                                <p>Use the least intrusive methods necessary to demonstrate vulnerabilities.</p>
+                            </div>
+                        </div>
+                        <div class="principle">
+                            <span class="principle-number">03</span>
+                            <div class="principle-content">
+                                <h4>Document Everything</h4>
+                                <p>Keep detailed records of your testing activities and findings.</p>
+                            </div>
+                        </div>
+                        <div class="principle">
+                            <span class="principle-number">04</span>
+                            <div class="principle-content">
+                                <h4>Responsible Disclosure</h4>
+                                <p>Report vulnerabilities to the appropriate parties through proper channels.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Tools Section -->
+        <section id="tools" class="tools-section">
+            <div class="container">
+                <h2 class="section-title">🛠️ Interactive Tools</h2>
+                <p class="section-subtitle">Practice with real cybersecurity tools in a safe environment</p>
+                
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">🔐</div>
+                            <h3>Password Strength Checker</h3>
+                        </div>
+                        <div class="tool-content">
+                            <input type="password" id="password-input" placeholder="Enter a password to test..." class="tool-input">
+                            <div class="password-strength">
+                                <div class="strength-bar">
+                                    <div class="strength-fill" id="strength-fill"></div>
+                                </div>
+                                <div class="strength-text" id="strength-text">Enter a password</div>
+                            </div>
+                            <div class="password-analysis" id="password-analysis">
+                                <div class="analysis-item">
+                                    <span class="check-icon" id="length-check">❌</span>
+                                    <span>At least 8 characters</span>
+                                </div>
+                                <div class="analysis-item">
+                                    <span class="check-icon" id="uppercase-check">❌</span>
+                                    <span>Contains uppercase letter</span>
+                                </div>
+                                <div class="analysis-item">
+                                    <span class="check-icon" id="lowercase-check">❌</span>
+                                    <span>Contains lowercase letter</span>
+                                </div>
+                                <div class="analysis-item">
+                                    <span class="check-icon" id="number-check">❌</span>
+                                    <span>Contains number</span>
+                                </div>
+                                <div class="analysis-item">
+                                    <span class="check-icon" id="special-check">❌</span>
+                                    <span>Contains special character</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">🔍</div>
+                            <h3>Hash Decoder</h3>
+                        </div>
+                        <div class="tool-content">
+                            <textarea id="hash-input" placeholder="Enter hash to identify type..." class="tool-textarea"></textarea>
+                            <div class="tool-actions">
+                                <button class="tool-btn" onclick="identifyHash()">Identify Hash</button>
+                                <button class="tool-btn" onclick="generateHash()">Generate Hash</button>
+                            </div>
+                            <div class="hash-result" id="hash-result">
+                                <div class="result-header">Result:</div>
+                                <div class="result-content">Enter a hash to analyze...</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">🌐</div>
+                            <h3>Network Scanner Simulator</h3>
+                        </div>
+                        <div class="tool-content">
+                            <input type="text" id="target-input" placeholder="Enter target IP or domain..." class="tool-input">
+                            <div class="scan-options">
+                                <label class="scan-option">
+                                    <input type="checkbox" checked> Port Scan
+                                </label>
+                                <label class="scan-option">
+                                    <input type="checkbox" checked> Service Detection
+                                </label>
+                                <label class="scan-option">
+                                    <input type="checkbox"> Aggressive Scan
+                                </label>
+                            </div>
+                            <button class="tool-btn primary" onclick="startNetworkScan()">Start Scan</button>
+                            <div class="scan-progress" id="scan-progress" style="display: none;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="scan-progress-fill"></div>
+                                </div>
+                                <div class="progress-text">Scanning...</div>
+                            </div>
+                            <div class="scan-results" id="scan-results">
+                                <div class="result-header">Scan Results:</div>
+                                <div class="result-content">Enter a target and click "Start Scan"</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">🛡️</div>
+                            <h3>Vulnerability Checker</h3>
+                        </div>
+                        <div class="tool-content">
+                            <textarea id="url-input" placeholder="Enter URL to check for common vulnerabilities..." class="tool-textarea"></textarea>
+                            <div class="vuln-types">
+                                <label class="vuln-option">
+                                    <input type="checkbox" checked> SQL Injection
+                                </label>
+                                <label class="vuln-option">
+                                    <input type="checkbox" checked> XSS
+                                </label>
+                                <label class="vuln-option">
+                                    <input type="checkbox" checked> CSRF
+                                </label>
+                                <label class="vuln-option">
+                                    <input type="checkbox"> Directory Traversal
+                                </label>
+                            </div>
+                            <button class="tool-btn danger" onclick="checkVulnerabilities()">Check Vulnerabilities</button>
+                            <div class="vuln-results" id="vuln-results">
+                                <div class="result-header">Vulnerability Assessment:</div>
+                                <div class="result-content">Enter a URL to begin assessment...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tools-disclaimer">
+                    <p>⚠️ <strong>Educational Purpose Only:</strong> These tools are for learning and should only be used on systems you own or have explicit permission to test.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Subjects Section -->
+        <section id="subjects" class="subjects-section">
+            <div class="container">
+                <h2 class="section-title">Ethical Hacking Subjects</h2>
+                
+                <!-- Search and Filter Controls -->
+                <div class="controls-section">
+                    <div class="search-container">
+                        <input type="text" id="subject-search" placeholder="🔍 Search subjects..." oninput="searchSubjects()">
+                        <button class="search-clear" onclick="clearSearch()" style="display: none;">×</button>
+                    </div>
+                    <div class="subjects-filter">
+                        <button class="filter-btn active" data-filter="all" onclick="filterSubjects('all')">All Subjects</button>
+                        <button class="filter-btn" data-filter="beginner" onclick="filterSubjects('beginner')">Beginner</button>
+                        <button class="filter-btn" data-filter="intermediate" onclick="filterSubjects('intermediate')">Intermediate</button>
+                        <button class="filter-btn" data-filter="advanced" onclick="filterSubjects('advanced')">Advanced</button>
+                    </div>
+                    <div class="sort-controls">
+                        <select id="sort-subjects" onchange="sortSubjects()">
+                            <option value="name">Sort by Name</option>
+                            <option value="difficulty">Sort by Difficulty</option>
+                            <option value="duration">Sort by Duration</option>
+                            <option value="progress">Sort by Progress</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="subjects-grid" id="subjects-grid">
+                    <div class="subject-card" data-difficulty="beginner" onclick="startTutorial('reconnaissance')">
+                        <div class="subject-header">
+                            <div class="subject-icon">🔍</div>
+                            <div class="difficulty-badge beginner">Beginner</div>
+                        </div>
+                        <h3>Reconnaissance</h3>
+                        <p>Learn information gathering techniques and OSINT methods</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">15 Steps</span>
+                            <span class="time-estimate">~4 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card" data-difficulty="intermediate" onclick="startTutorial('vulnerability-assessment')">
+                        <div class="subject-header">
+                            <div class="subject-icon">🛡️</div>
+                            <div class="difficulty-badge intermediate">Intermediate</div>
+                        </div>
+                        <h3>Vulnerability Assessment</h3>
+                        <p>Identify and analyze security weaknesses in systems</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">18 Steps</span>
+                            <span class="time-estimate">~6 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card" data-difficulty="advanced" onclick="startTutorial('penetration-testing')">
+                        <div class="subject-header">
+                            <div class="subject-icon">⚔️</div>
+                            <div class="difficulty-badge advanced">Advanced</div>
+                        </div>
+                        <h3>Penetration Testing</h3>
+                        <p>Simulate cyber attacks to test security defenses</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">20 Steps</span>
+                            <span class="time-estimate">~8 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card" data-difficulty="intermediate" onclick="startTutorial('social-engineering')">
+                        <div class="subject-header">
+                            <div class="subject-icon">👥</div>
+                            <div class="difficulty-badge intermediate">Intermediate</div>
+                        </div>
+                        <h3>Social Engineering</h3>
+                        <p>Understand human psychology in cybersecurity context</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">12 Steps</span>
+                            <span class="time-estimate">~3 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card" data-difficulty="intermediate" onclick="startTutorial('web-security')">
+                        <div class="subject-header">
+                            <div class="subject-icon">🌐</div>
+                            <div class="difficulty-badge intermediate">Intermediate</div>
+                        </div>
+                        <h3>Web Application Security</h3>
+                        <p>Test and secure web applications against common attacks</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">22 Steps</span>
+                            <span class="time-estimate">~8 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card" data-difficulty="advanced" onclick="startTutorial('network-security')">
+                        <div class="subject-header">
+                            <div class="subject-icon">🔗</div>
+                            <div class="difficulty-badge advanced">Advanced</div>
+                        </div>
+                        <h3>Network Security</h3>
+                        <p>Analyze and secure network infrastructures</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">16 Steps</span>
+                            <span class="time-estimate">~5 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card" data-difficulty="beginner" onclick="startTutorial('cryptography')">
+                        <div class="subject-header">
+                            <div class="subject-icon">🔐</div>
+                            <div class="difficulty-badge beginner">Beginner</div>
+                        </div>
+                        <h3>Cryptography & Encryption</h3>
+                        <p>Master encryption algorithms and cryptographic attacks</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">14 Steps</span>
+                            <span class="time-estimate">~4 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card" data-difficulty="intermediate" onclick="startTutorial('wireless-security')">
+                        <div class="subject-header">
+                            <div class="subject-icon">📶</div>
+                            <div class="difficulty-badge intermediate">Intermediate</div>
+                        </div>
+                        <h3>Wireless Security</h3>
+                        <p>Exploit WiFi networks and wireless protocols</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">18 Steps</span>
+                            <span class="time-estimate">~6 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card" data-difficulty="intermediate" onclick="startTutorial('mobile-security')">
+                        <div class="subject-header">
+                            <div class="subject-icon">📱</div>
+                            <div class="difficulty-badge intermediate">Intermediate</div>
+                        </div>
+                        <h3>Mobile Security</h3>
+                        <p>Test Android and iOS app security vulnerabilities</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">20 Steps</span>
+                            <span class="time-estimate">~7 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card" data-difficulty="advanced" onclick="startTutorial('digital-forensics')">
+                        <div class="subject-header">
+                            <div class="subject-icon">🕵️</div>
+                            <div class="difficulty-badge advanced">Advanced</div>
+                        </div>
+                        <h3>Digital Forensics</h3>
+                        <p>Investigate digital crimes and collect evidence</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">16 Steps</span>
+                            <span class="time-estimate">~8 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card" data-difficulty="advanced" onclick="startTutorial('malware-analysis')">
+                        <div class="subject-header">
+                            <div class="subject-icon">🦠</div>
+                            <div class="difficulty-badge advanced">Advanced</div>
+                        </div>
+                        <h3>Malware Analysis</h3>
+                        <p>Reverse engineer and analyze malicious software</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">22 Steps</span>
+                            <span class="time-estimate">~10 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card" data-difficulty="intermediate" onclick="startTutorial('physical-security')">
+                        <div class="subject-header">
+                            <div class="subject-icon">🔒</div>
+                            <div class="difficulty-badge intermediate">Intermediate</div>
+                        </div>
+                        <h3>Physical Security</h3>
+                        <p>Master lock picking and physical penetration</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">15 Steps</span>
+                            <span class="time-estimate">~5 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card" data-difficulty="intermediate" onclick="startTutorial('cloud-security')">
+                        <div class="subject-header">
+                            <div class="subject-icon">☁️</div>
+                            <div class="difficulty-badge intermediate">Intermediate</div>
+                        </div>
+                        <h3>Cloud Security</h3>
+                        <p>Assess AWS, Azure, and GCP security configurations</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">17 Steps</span>
+                            <span class="time-estimate">~6 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card" data-difficulty="beginner" onclick="startTutorial('incident-response')">
+                        <div class="subject-header">
+                            <div class="subject-icon">🚨</div>
+                            <div class="difficulty-badge beginner">Beginner</div>
+                        </div>
+                        <h3>Incident Response</h3>
+                        <p>Handle security incidents and threat hunting</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">13 Steps</span>
+                            <span class="time-estimate">~4 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Achievements Section -->
+        <section id="achievements" class="achievements-section" style="display: none;">
+            <div class="container">
+                <div class="achievements-header">
+                    <h2 class="section-title">🏆 Achievements</h2>
+                    <p class="section-description">Track your progress and unlock achievements as you master ethical hacking concepts.</p>
+                </div>
+                
+                <div class="achievements-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="unlocked-count">0</div>
+                        <div class="stat-label">Unlocked</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-achievements">15</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="completion-percentage">0%</div>
+                        <div class="stat-label">Complete</div>
+                    </div>
+                </div>
+
+                <!-- Achievement Controls -->
+                <div class="achievements-controls">
+                    <div class="achievement-search">
+                        <input type="text" id="achievement-search" placeholder="🔍 Search achievements..." class="search-input">
+                    </div>
+                    <div class="achievement-filters">
+                        <button class="filter-btn active" data-category="all">All</button>
+                        <button class="filter-btn" data-category="learning">📚 Learning</button>
+                        <button class="filter-btn" data-category="skills">⚡ Skills</button>
+                        <button class="filter-btn" data-category="speed">🏃 Speed</button>
+                        <button class="filter-btn" data-category="special">⭐ Special</button>
+                    </div>
+                </div>
+
+                <div class="achievements-grid">
+                    <!-- Learning Category -->
+                    <div class="achievement-card locked" data-id="first-steps" data-category="learning" data-rarity="common" title="Complete any beginner subject">
+                        <div class="achievement-rarity rarity-common"></div>
+                        <div class="achievement-icon">🥉</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">First Steps</h3>
+                            <p class="achievement-description">Complete any beginner subject</p>
+                            <div class="achievement-tags">
+                                <span class="tag learning">Learning</span>
+                                <span class="tag common">Common</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/1</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <div class="achievement-card locked" data-id="half-way" data-category="learning" data-rarity="rare" title="Complete 6 steps total across all subjects">
+                        <div class="achievement-rarity rarity-rare"></div>
+                        <div class="achievement-icon">🥈</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Half Way There</h3>
+                            <p class="achievement-description">Complete 6 steps total across all subjects</p>
+                            <div class="achievement-tags">
+                                <span class="tag learning">Learning</span>
+                                <span class="tag rare">Rare</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/6</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <div class="achievement-card locked" data-id="master-hacker" data-category="learning" data-rarity="legendary" title="Complete all subjects in the platform">
+                        <div class="achievement-rarity rarity-legendary"></div>
+                        <div class="achievement-icon">🥇</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Master Hacker</h3>
+                            <p class="achievement-description">Complete all subjects in the platform</p>
+                            <div class="achievement-tags">
+                                <span class="tag learning">Learning</span>
+                                <span class="tag legendary">Legendary</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/14</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <!-- Skills Category -->
+                    <div class="achievement-card locked" data-id="quiz-master" data-category="skills" data-rarity="rare" title="Score 100% on 5 quizzes">
+                        <div class="achievement-rarity rarity-rare"></div>
+                        <div class="achievement-icon">🧠</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Quiz Master</h3>
+                            <p class="achievement-description">Score 100% on 5 quizzes</p>
+                            <div class="achievement-tags">
+                                <span class="tag skills">Skills</span>
+                                <span class="tag rare">Rare</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/5</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <div class="achievement-card locked" data-id="penetration-tester" data-category="skills" data-rarity="epic" title="Complete all penetration testing subjects">
+                        <div class="achievement-rarity rarity-epic"></div>
+                        <div class="achievement-icon">🎯</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Penetration Tester</h3>
+                            <p class="achievement-description">Complete all penetration testing subjects</p>
+                            <div class="achievement-tags">
+                                <span class="tag skills">Skills</span>
+                                <span class="tag epic">Epic</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/4</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <div class="achievement-card locked" data-id="cryptography-expert" data-category="skills" data-rarity="epic" title="Master all cryptography challenges">
+                        <div class="achievement-rarity rarity-epic"></div>
+                        <div class="achievement-icon">🔐</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Cryptography Expert</h3>
+                            <p class="achievement-description">Master all cryptography challenges</p>
+                            <div class="achievement-tags">
+                                <span class="tag skills">Skills</span>
+                                <span class="tag epic">Epic</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/3</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <!-- Speed Category -->
+                    <div class="achievement-card locked" data-id="speed-demon" data-category="speed" data-rarity="rare" title="Complete a challenge in under 2 minutes">
+                        <div class="achievement-rarity rarity-rare"></div>
+                        <div class="achievement-icon">⚡</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Speed Demon</h3>
+                            <p class="achievement-description">Complete a challenge in under 2 minutes</p>
+                            <div class="achievement-tags">
+                                <span class="tag speed">Speed</span>
+                                <span class="tag rare">Rare</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/1</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <div class="achievement-card locked" data-id="lightning-fast" data-category="speed" data-rarity="epic" title="Complete 3 consecutive challenges in under 5 minutes each">
+                        <div class="achievement-rarity rarity-epic"></div>
+                        <div class="achievement-icon">🏃</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Lightning Fast</h3>
+                            <p class="achievement-description">Complete 3 consecutive challenges in under 5 minutes each</p>
+                            <div class="achievement-tags">
+                                <span class="tag speed">Speed</span>
+                                <span class="tag epic">Epic</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/3</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <div class="achievement-card locked" data-id="marathon-runner" data-category="speed" data-rarity="common" title="Complete 10 challenges in a single session">
+                        <div class="achievement-rarity rarity-common"></div>
+                        <div class="achievement-icon">🏃‍♀️</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Marathon Runner</h3>
+                            <p class="achievement-description">Complete 10 challenges in a single session</p>
+                            <div class="achievement-tags">
+                                <span class="tag speed">Speed</span>
+                                <span class="tag common">Common</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/10</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <!-- Special Category -->
+                    <div class="achievement-card locked" data-id="early-bird" data-category="special" data-rarity="rare" title="Complete a challenge before 6 AM">
+                        <div class="achievement-rarity rarity-rare"></div>
+                        <div class="achievement-icon">🌅</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Early Bird</h3>
+                            <p class="achievement-description">Complete a challenge before 6 AM</p>
+                            <div class="achievement-tags">
+                                <span class="tag special">Special</span>
+                                <span class="tag rare">Rare</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/1</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <div class="achievement-card locked" data-id="night-owl" data-category="special" data-rarity="rare" title="Complete a challenge after midnight">
+                        <div class="achievement-rarity rarity-rare"></div>
+                        <div class="achievement-icon">🦉</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Night Owl</h3>
+                            <p class="achievement-description">Complete a challenge after midnight</p>
+                            <div class="achievement-tags">
+                                <span class="tag special">Special</span>
+                                <span class="tag rare">Rare</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/1</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <div class="achievement-card locked" data-id="perfect-week" data-category="special" data-rarity="legendary" title="Complete at least one challenge every day for 7 consecutive days">
+                        <div class="achievement-rarity rarity-legendary"></div>
+                        <div class="achievement-icon">📅</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Perfect Week</h3>
+                            <p class="achievement-description">Complete at least one challenge every day for 7 consecutive days</p>
+                            <div class="achievement-tags">
+                                <span class="tag special">Special</span>
+                                <span class="tag legendary">Legendary</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/7</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <div class="achievement-card locked" data-id="easter-egg-hunter" data-category="special" data-rarity="epic" title="Find 5 hidden easter eggs in the platform">
+                        <div class="achievement-rarity rarity-epic"></div>
+                        <div class="achievement-icon">🥚</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Easter Egg Hunter</h3>
+                            <p class="achievement-description">Find 5 hidden easter eggs in the platform</p>
+                            <div class="achievement-tags">
+                                <span class="tag special">Special</span>
+                                <span class="tag epic">Epic</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/5</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <div class="achievement-card locked" data-id="social-butterfly" data-category="special" data-rarity="common" title="Share 3 achievements on social media">
+                        <div class="achievement-rarity rarity-common"></div>
+                        <div class="achievement-icon">🦋</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Social Butterfly</h3>
+                            <p class="achievement-description">Share 3 achievements on social media</p>
+                            <div class="achievement-tags">
+                                <span class="tag special">Special</span>
+                                <span class="tag common">Common</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/3</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+                </div>
+
+                <!-- Achievement Details Modal -->
+                <div id="achievement-modal" class="achievement-modal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 id="modal-achievement-name"></h2>
+                            <button class="modal-close" onclick="closeAchievementModal()">✕</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="modal-icon-container">
+                                <div id="modal-achievement-icon" class="modal-achievement-icon"></div>
+                                <div id="modal-achievement-rarity" class="modal-rarity"></div>
+                            </div>
+                            <p id="modal-achievement-description" class="modal-description"></p>
+                            <div id="modal-achievement-details" class="modal-details"></div>
+                            <div class="modal-progress">
+                                <div class="progress-label">Progress</div>
+                                <div class="progress-bar large">
+                                    <div id="modal-progress-fill" class="progress-fill"></div>
+                                </div>
+                                <div id="modal-progress-text" class="progress-text"></div>
+                            </div>
+                            <div class="modal-actions">
+                                <button id="modal-share-btn" class="btn-primary">Share Achievement</button>
+                                <button id="modal-tips-btn" class="btn-secondary">Show Tips</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tutorial Section (Hidden by default) -->
+        <section id="tutorial" class="tutorial-section" style="display: none;">
+            <div class="container">
+                <div class="tutorial-header">
+                    <button class="back-button" onclick="goBackToSubjects()">← Back to Subjects</button>
+                    <h2 id="tutorial-title" class="tutorial-title"></h2>
+                    <div class="progress-indicator">
+                        <span id="current-step">1</span> / <span id="total-steps">0</span>
+                    </div>
+                </div>
+                
+                <div class="tutorial-content">
+                    <div class="tutorial-main">
+                        <div class="step-content">
+                            <h3 id="step-title"></h3>
+                            <div id="step-description"></div>
+                            <div id="step-code" class="code-block" style="display: none;"></div>
+                            <div id="step-tips" class="tips-section" style="display: none;"></div>
+                            
+                            <!-- Interactive Quiz Section -->
+                            <div id="quiz-section" class="quiz-section" style="display: none;">
+                                <div class="quiz-header">
+                                    <h4>🧠 Quick Knowledge Check</h4>
+                                    <div class="quiz-progress">
+                                        Question <span id="quiz-current">1</span> of <span id="quiz-total">3</span>
+                                    </div>
+                                </div>
+                                <div class="quiz-content">
+                                    <div class="question-container">
+                                        <p id="quiz-question" class="quiz-question"></p>
+                                        <div id="quiz-options" class="quiz-options"></div>
+                                    </div>
+                                    <div class="quiz-feedback" id="quiz-feedback" style="display: none;">
+                                        <div class="feedback-content">
+                                            <div class="feedback-icon"></div>
+                                            <div class="feedback-text"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="quiz-controls">
+                                    <button id="quiz-submit" class="quiz-btn primary" style="display: none;">Submit Answer</button>
+                                    <button id="quiz-next" class="quiz-btn primary" style="display: none;">Next Question</button>
+                                    <button id="quiz-complete" class="quiz-btn success" style="display: none;">Complete Quiz</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Interactive Challenge Section -->
+                            <div id="challenge-section" class="challenge-section" style="display: none;">
+                                <div class="challenge-header">
+                                    <h4>💻 Hands-On Challenge</h4>
+                                    <div class="challenge-timer">
+                                        <span id="challenge-time">--:--</span>
+                                    </div>
+                                </div>
+                                <div class="challenge-content">
+                                    <div class="challenge-description">
+                                        <p id="challenge-prompt"></p>
+                                        <div class="challenge-hints">
+                                            <button class="hint-btn" onclick="showHint(1)">💡 Hint 1</button>
+                                            <button class="hint-btn" onclick="showHint(2)">💡 Hint 2</button>
+                                        </div>
+                                        <div id="challenge-hints-content" class="hints-content"></div>
+                                    </div>
+                                    <div class="challenge-input">
+                                        <textarea id="challenge-code" placeholder="Enter your solution here..."></textarea>
+                                        <div class="challenge-actions">
+                                            <button class="challenge-btn" onclick="validateChallenge()">🔍 Validate</button>
+                                            <button class="challenge-btn" onclick="runChallenge()">▶️ Run</button>
+                                            <button class="challenge-btn" onclick="resetChallenge()">🔄 Reset</button>
+                                        </div>
+                                    </div>
+                                    <div id="challenge-output" class="challenge-output">
+                                        <div class="output-header">Output:</div>
+                                        <div class="output-content">Enter your code and click Run to see the output...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="code-playground" class="code-playground" style="display: none;">
+                            <div class="playground-header">
+                                <h4>🧪 Try It Yourself</h4>
+                                <div class="playground-header-controls">
+                                    <button class="help-button" onclick="showPlaygroundHelp()" title="Show keyboard shortcuts">❓</button>
+                                    <button class="playground-toggle" onclick="togglePlayground()">Hide Playground</button>
+                                </div>
+                            </div>
+                            <div class="playground-content">
+                                <textarea id="playground-input" placeholder="Enter your commands here...&#10;&#10;Examples:&#10;• nmap -sV target.com&#10;• ping google.com&#10;• grep -r 'password' /var/log/&#10;• echo 'Hello World' | sha256sum"></textarea>
+                                <div class="playground-buttons">
+                                    <button class="run-button" onclick="runCode()">▶️ Run Code</button>
+                                    <button class="clear-button" onclick="clearPlayground()">🗑️ Clear</button>
+                                    <button class="example-button" onclick="loadExample()">💡 Load Example</button>
+                                </div>
+                                <div id="playground-output" class="playground-output">
+                                    <div class="output-header">
+                                        <span>📟 Terminal Output</span>
+                                        <button class="clear-output-btn" onclick="clearOutput()" title="Clear output">🗑️</button>
+                                    </div>
+                                    <div class="output-content">Ready to execute commands... Type a command above and click Run!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tutorial-sidebar">
+                        <div class="step-navigator">
+                            <h4>Steps</h4>
+                            <div id="step-list" class="step-list"></div>
+                        </div>
+                        
+                        <!-- Learning Stats -->
+                        <div class="stats-panel">
+                            <h4>📊 Your Progress</h4>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-label">Steps Completed</span>
+                                    <span class="stat-value" id="total-steps-completed">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Quiz Score</span>
+                                    <span class="stat-value" id="average-quiz-score">0%</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Learning Streak</span>
+                                    <span class="stat-value" id="learning-streak">0 days</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Time Spent</span>
+                                    <span class="stat-value" id="time-spent">0h 0m</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tutorial-navigation">
+                    <button id="prev-button" class="nav-button" onclick="previousStep()" disabled>Previous</button>
+                    <div class="tutorial-actions">
+                        <button class="action-button" onclick="togglePlayground()" id="playground-btn">
+                            🧪 Try Code
+                        </button>
+                        <button class="action-button" onclick="bookmarkStep()">
+                            📌 Bookmark
+                        </button>
+                    </div>
+                    <button id="next-button" class="nav-button primary" onclick="nextStep()">Next</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Bytrox. Educational purposes only. Use ethically and responsibly.</p>
+                <div class="footer-links">
+                    <span>🛡️ Always get proper authorization</span>
+                    <span>📚 Learn responsibly</span>
+                    <span>⚖️ Follow local laws</span>
+                    <span class="tooltip" data-tooltip="Press 1 for Home, 2 for Subjects, 3 for About, ESC to go back">⌨️ Keyboard shortcuts</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-primary); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Chat Bot -->
+    <div class="chat-bot" id="chat-bot">
+        <div class="chat-header">
+            <div class="chat-avatar">🤖</div>
+            <div class="chat-info">
+                <h4>BytroxAI Assistant</h4>
+                <span class="status online">Online</span>
+            </div>
+            <button class="chat-close" onclick="toggleChat()">×</button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot">
+                <div class="message-content">
+                    <p>Hi! I'm your AI assistant. I can help you with ethical hacking concepts, answer questions, and guide you through tutorials. What would you like to learn today?</p>
+                </div>
+                <div class="message-time">Now</div>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chat-input-field" placeholder="Ask me about ethical hacking..." onkeypress="handleChatKeyPress(event)">
+            <button class="chat-send" onclick="sendChatMessage()">📤</button>
+        </div>
+        <div class="chat-suggestions">
+            <button class="suggestion-btn" onclick="askPresetQuestion('What is SQL injection?')">What is SQL injection?</button>
+            <button class="suggestion-btn" onclick="askPresetQuestion('How to start with pentesting?')">How to start with pentesting?</button>
+            <button class="suggestion-btn" onclick="askPresetQuestion('Best ethical hacking tools?')">Best ethical hacking tools?</button>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button class="chat-toggle" id="chat-toggle" onclick="toggleChat()">
+        <span class="chat-icon">💬</span>
+        <span class="notification-badge" id="chat-notification" style="display: none;">1</span>
+    </button>
+
+    <!-- User Profile Modal -->
+    <div class="modal" id="profile-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👤 User Profile</h3>
+                <button class="modal-close" onclick="closeModal('profile-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-section">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar large" id="profile-avatar">👤</div>
+                        <button class="change-avatar-btn" onclick="changeAvatar()">Change Avatar</button>
+                    </div>
+                    <div class="profile-info">
+                        <div class="form-group">
+                            <label>Display Name</label>
+                            <input type="text" id="profile-name" placeholder="Enter your name" value="Ethical Hacker">
+                        </div>
+                        <div class="form-group">
+                            <label>Learning Goal</label>
+                            <select id="profile-goal">
+                                <option value="beginner">🌱 Complete Beginner</option>
+                                <option value="career">💼 Career Change</option>
+                                <option value="certification">🏆 Get Certified</option>
+                                <option value="hobbyist">🎯 Personal Interest</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Daily Goal (minutes)</label>
+                            <input type="range" id="daily-goal" min="15" max="180" value="60" oninput="updateGoalDisplay(this.value)">
+                            <span id="goal-display">60 minutes</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-stats">
+                    <h4>📊 Your Statistics</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📚</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="profile-subjects-completed">0</span>
+                                <span class="stat-label">Subjects Completed</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏱️</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="profile-time-spent">0h</span>
+                                <span class="stat-label">Time Spent Learning</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🔥</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="profile-streak">0</span>
+                                <span class="stat-label">Day Streak</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="profile-achievements">0</span>
+                                <span class="stat-label">Achievements Unlocked</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Player Information -->
+                <div class="profile-section">
+                    <h4>📊 Player Statistics</h4>
+                    <div class="profile-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">⭐</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="profile-level">1</span>
+                                <span class="stat-label">Level</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🎯</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="profile-experience">0</span>
+                                <span class="stat-label">Experience Points</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🎖️</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="profile-rank">Novice</span>
+                                <span class="stat-label">Rank</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="profile-longest-streak">0</span>
+                                <span class="stat-label">Longest Streak</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Data Management -->
+                <div class="profile-section">
+                    <h4>💾 Data Management</h4>
+                    <div class="data-management-buttons">
+                        <button class="btn secondary" onclick="exportPlayerData()">📤 Export Data</button>
+                        <label class="btn secondary" for="import-data">📥 Import Data</label>
+                        <input type="file" id="import-data" accept=".json" onchange="importPlayerData(event)" style="display: none;">
+                        <button class="btn danger" onclick="resetPlayerData()">🗑️ Reset All Data</button>
+                    </div>
+                    <div class="auto-save-setting">
+                        <label>
+                            <input type="checkbox" id="auto-save-toggle" checked onchange="toggleAutoSave()">
+                            Auto-save progress
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn secondary" onclick="closeModal('profile-modal')">Cancel</button>
+                <button class="btn primary" onclick="saveProfile()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Challenge Modal -->
+    <div class="modal" id="daily-challenge-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🎯 Daily Challenge</h3>
+                <button class="modal-close" onclick="closeModal('daily-challenge-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="challenge-info">
+                    <div class="challenge-icon">💎</div>
+                    <h4 id="daily-challenge-title">Reconnaissance Master</h4>
+                    <p id="daily-challenge-description">Complete 3 reconnaissance tutorial steps to earn bonus points!</p>
+                    <div class="challenge-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="daily-challenge-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text"><span id="daily-progress-current">0</span>/3 completed</span>
+                    </div>
+                    <div class="challenge-reward">
+                        <span class="reward-icon">🏆</span>
+                        <span>Reward: 500 XP + Special Badge</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn primary" onclick="startDailyChallenge()">Accept Challenge</button>
+                <button class="btn secondary" onclick="closeModal('daily-challenge-modal')">Maybe Later</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievement Notification -->
+    <div class="achievement-notification" id="achievement-notification" style="display: none;">
+        <div class="achievement-content">
+            <div class="achievement-icon-large" id="achievement-icon">🏆</div>
+            <div class="achievement-info">
+                <h4 id="achievement-title">Achievement Unlocked!</h4>
+                <p id="achievement-desc">You've reached a new milestone</p>
+            </div>
+        </div>
+        <button class="achievement-close" onclick="closeAchievement()">×</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
