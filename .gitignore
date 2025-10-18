@@ -14,6 +14,16 @@ package-lock.json
 config.js
 secrets.js
 *.key
+*.pem
+*.p12
+*.p8
+*.crt
+*.cer
+*_key
+*_secret
+*_token
+api_keys.*
+credentials.*
 
 # Runtime data
 pids

@@ -8608,9 +8608,12 @@ function removeTypingIndicator() {
 async function getAIResponse(message) {
     console.log('Getting AI response for:', message);
     
-    // Check if config is properly loaded
-    if (!window.AI_CONFIG || !window.AI_CONFIG.apiKey || window.AI_CONFIG.apiKey === 'YOUR_GOOGLE_API_KEY_HERE') {
-        throw new Error('API configuration not properly set. Please check your config.js file.');
+    // Enhanced security: Check if config is properly loaded
+    if (!window.AI_CONFIG || !window.AI_CONFIG.apiKey || 
+        window.AI_CONFIG.apiKey === 'YOUR_GOOGLE_API_KEY_HERE' ||
+        window.AI_CONFIG.apiKey.length < 20 ||
+        window.AI_CONFIG.apiKey === '') {
+        throw new Error('API configuration not properly set. Please check your config.js file and ensure you have a valid Google API key.');
     }
     
     const requestBody = {
@@ -8628,7 +8631,8 @@ async function getAIResponse(message) {
     console.log('Request body:', JSON.stringify(requestBody, null, 2));
 
     try {
-        console.log('Making API request to:', `${window.AI_CONFIG.apiUrl}?key=${window.AI_CONFIG.apiKey}`);
+        // Security: Don't log API keys in console
+        console.log('Making API request to:', window.AI_CONFIG.apiUrl);
         
         const response = await fetch(`${window.AI_CONFIG.apiUrl}?key=${window.AI_CONFIG.apiKey}`, {
             method: 'POST',

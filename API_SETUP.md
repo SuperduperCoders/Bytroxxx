@@ -18,16 +18,20 @@ This project requires a Google API key for the AI chat functionality. The API ke
    - Save the file
 
 3. **Important Security Notes:**
-   - Never commit `config.js` to version control
+   - **NEVER** commit `config.js` to version control
    - The `config.js` file is already in `.gitignore`
    - Keep your API keys secure and private
+   - API keys are NOT logged to console for security
+   - Regularly rotate your API keys
+   - See `SECURITY.md` for comprehensive security guidelines
 
 ### File Structure:
 ```
 ├── config.template.js  (Template - safe to commit)
 ├── config.js          (Your actual config - DO NOT COMMIT)
 ├── .gitignore         (Prevents config.js from being committed)
-└── README.md          (This file)
+├── SECURITY.md        (Security guidelines and best practices)
+└── API_SETUP.md       (This file)
 ```
 
 ### Running the Application:
