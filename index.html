@@ -6,7 +6,7 @@
     <title>Bytrox - Ethical Hacking Learning Platform</title>
     
     <!-- SEO and Performance Meta Tags -->
-    <meta name="description" content="Learn ethical hacking through hands-on tutorials. Master cybersecurity with 28+ subjects, interactive tools, and step-by-step guidance. 100% ethical education. Updated October 2024.">
+    <meta name="description" content="Learn ethical hacking through hands-on tutorials. Master cybersecurity with 30+ subjects including AI security, interactive tools, and step-by-step guidance. 100% ethical education. Updated October 2025.">
     <meta name="keywords" content="ethical hacking, cybersecurity, penetration testing, security education, OSINT, vulnerability assessment, cyber security training, hacking course">
     <meta name="author" content="Bytrox - SuperduperCoders">
     <meta name="robots" content="index, follow">
@@ -74,7 +74,10 @@
                         <div class="dropdown-item" onclick="openProgress()" role="menuitem" tabindex="0">📊 Progress</div>
                         <div class="dropdown-item" onclick="openRedeemCode()" role="menuitem" tabindex="0">🎁 Redeem Code</div>
                         <div class="dropdown-item" onclick="openSettings()" role="menuitem" tabindex="0">⚙️ Settings</div>
-                        <div class="dropdown-item" onclick="toggleTheme()" role="menuitem" tabindex="0">🌓 Toggle Theme</div>
+                        <div class="dropdown-item" onclick="toggleTheme()" role="menuitem" tabindex="0" id="theme-toggle">
+                            <span id="theme-icon">🌓</span>
+                            <span id="theme-text">Dark Mode</span>
+                        </div>
                     </div>
                 </div>
             </nav>
@@ -86,8 +89,29 @@
         <!-- Home Section -->
         <section id="home" class="hero">
             <div class="matrix-bg"></div>
+            <div class="floating-particles"></div>
             <div class="container">
                 <div class="hero-content">
+                    <!-- Enhanced Feature Cards -->
+                    <div class="floating-cards">
+                        <div class="feature-card" data-delay="0.2s">
+                            <div class="card-icon">🛡️</div>
+                            <span>Ethical First</span>
+                        </div>
+                        <div class="feature-card" data-delay="0.4s">
+                            <div class="card-icon">🚀</div>
+                            <span>2025 Updated</span>
+                        </div>
+                        <div class="feature-card" data-delay="0.6s">
+                            <div class="card-icon">🎯</div>
+                            <span>Hands-On</span>
+                        </div>
+                        <div class="feature-card" data-delay="0.8s">
+                            <div class="card-icon">🤖</div>
+                            <span>AI Assisted</span>
+                        </div>
+                    </div>
+
                     <div class="terminal-window">
                         <div class="terminal-header">
                             <span class="terminal-dot red"></span>
@@ -102,36 +126,108 @@
                                 <span class="cursor" id="cursor">|</span>
                             </div>
                             <div class="terminal-output" id="terminal-output" style="display: none;">
-                                <div class="output-line">Initializing Bytrox Learning Platform...</div>
+                                <div class="output-line">Initializing Bytrox Learning Platform v2.1...</div>
                                 <div class="output-line">Loading ethical hacking modules... ✓</div>
+                                <div class="output-line">AI Assistant ready... ✓</div>
                                 <div class="output-line">Establishing secure connection... ✓</div>
-                                <div class="output-line success">Welcome to the future of ethical hacking education!</div>
+                                <div class="output-line success">🚀 Welcome to the future of ethical hacking education!</div>
                             </div>
                         </div>
                     </div>
-                    <h1 class="hero-title">Master Ethical Hacking</h1>
-                    <p class="hero-subtitle">Learn cybersecurity through hands-on, step-by-step tutorials designed for the next generation of ethical hackers. Updated with latest 2025 techniques and tools.</p>
+                    <h1 class="hero-title">
+                        <span class="title-gradient">Master Ethical Hacking</span>
+                        <div class="title-accent">with AI-Powered Learning</div>
+                    </h1>
+                    <p class="hero-subtitle">Learn cybersecurity through hands-on, step-by-step tutorials designed for the next generation of ethical hackers. Updated with latest 2025 techniques, tools, and AI security concepts.</p>
+                    
+                    <!-- Enhanced CTA Section -->
                     <div class="hero-buttons">
-                        <button class="cta-button primary" onclick="showSubjects()" title="Start your ethical hacking journey">
-                            <span>Start Learning</span>
-                            <i class="arrow">→</i>
+                        <button class="cta-button primary enhanced" onclick="showSubjects()" title="Start your ethical hacking journey">
+                            <div class="button-bg"></div>
+                            <span class="button-content">
+                                <span class="button-icon">🚀</span>
+                                <span class="button-text">Start Learning</span>
+                                <i class="arrow">→</i>
+                            </span>
                         </button>
                         <button class="cta-button secondary" onclick="scrollToAbout()" title="Learn more about our platform">
-                            <span>Learn More</span>
+                            <span class="button-content">
+                                <span class="button-icon">📚</span>
+                                <span class="button-text">Learn More</span>
+                            </span>
+                        </button>
+                        <button class="cta-button tertiary" onclick="showAIChat()" title="Try our AI assistant">
+                            <span class="button-content">
+                                <span class="button-icon">🤖</span>
+                                <span class="button-text">Try AI Assistant</span>
+                            </span>
                         </button>
                     </div>
+                    
+                    <!-- Enhanced Stats with Animations -->
                     <div class="hero-stats">
-                        <div class="stat tooltip" data-tooltip="Comprehensive subjects covering all aspects of ethical hacking">
-                            <span class="stat-number">28</span>
+                        <div class="stat tooltip animated" data-tooltip="Comprehensive subjects covering all aspects of ethical hacking">
+                            <div class="stat-icon">📚</div>
+                            <span class="stat-number" data-count="30">0</span>
                             <span class="stat-label">Subjects</span>
                         </div>
-                        <div class="stat tooltip" data-tooltip="Hands-on tutorial steps with practical examples">
-                            <span class="stat-number">450+</span>
+                        <div class="stat tooltip animated" data-tooltip="Hands-on tutorial steps with practical examples">
+                            <div class="stat-icon">⚡</div>
+                            <span class="stat-number" data-count="500">0</span>
                             <span class="stat-label">Steps</span>
                         </div>
-                        <div class="stat tooltip" data-tooltip="All content follows ethical hacking principles">
-                            <span class="stat-number">100%</span>
-                            <span class="stat-label">Ethical</span>
+                        <div class="stat tooltip animated" data-tooltip="All content follows ethical hacking principles">
+                            <div class="stat-icon">🛡️</div>
+                            <span class="stat-number" data-count="100">0</span>
+                            <span class="stat-label">% Ethical</span>
+                        </div>
+                        <div class="stat tooltip animated" data-tooltip="Active learners worldwide">
+                            <div class="stat-icon">👥</div>
+                            <span class="stat-number" data-count="1000">0</span>
+                            <span class="stat-label">Learners</span>
+                        </div>
+                    </div>
+                    
+                    <!-- New Quick Start Cards -->
+                    <div class="quick-start-section">
+                        <h3 class="quick-start-title">🎯 Quick Start Options</h3>
+                        <div class="quick-start-grid">
+                            <div class="quick-start-card" onclick="startTutorial('reconnaissance')">
+                                <div class="card-header">
+                                    <span class="card-icon">🔍</span>
+                                    <span class="difficulty-badge beginner">Beginner</span>
+                                </div>
+                                <h4>Information Gathering</h4>
+                                <p>Start with OSINT and reconnaissance fundamentals</p>
+                                <div class="card-footer">
+                                    <span class="duration">~30 min</span>
+                                    <span class="action">Start →</span>
+                                </div>
+                            </div>
+                            <div class="quick-start-card" onclick="showAIChat()">
+                                <div class="card-header">
+                                    <span class="card-icon">🤖</span>
+                                    <span class="difficulty-badge new">New</span>
+                                </div>
+                                <h4>AI Assistant</h4>
+                                <p>Get instant help with any cybersecurity question</p>
+                                <div class="card-footer">
+                                    <span class="duration">Chat now</span>
+                                    <span class="action">Try →</span>
+                                </div>
+                            </div>
+                            <div class="quick-start-card" onclick="showTools()">
+                                <div class="card-header">
+                                    <span class="card-icon">🛠️</span>
+                                    <span class="difficulty-badge interactive">Interactive</span>
+                                </div>
+                                <h4>Security Tools</h4>
+                                <p>Practice with safe, simulated security tools</p>
+                                <div class="card-footer">
+                                    <span class="duration">~15 min</span>
+                                    <span class="action">Explore →</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -316,6 +412,111 @@
                             <div class="vuln-results" id="vuln-results">
                                 <div class="result-header">Vulnerability Assessment:</div>
                                 <div class="result-content">Enter a URL to begin assessment...</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- New Enhanced Tools -->
+                    <div class="tool-card new-tool">
+                        <div class="tool-header">
+                            <div class="tool-icon">💉</div>
+                            <h3>SQL Injection Tester</h3>
+                            <span class="new-badge">New</span>
+                        </div>
+                        <div class="tool-content">
+                            <input type="text" id="sql-target" placeholder="Enter target URL or parameter..." class="tool-input">
+                            <div class="payload-selector">
+                                <label>Select Payload Type:</label>
+                                <select id="sql-payload-type" class="tool-select">
+                                    <option value="basic">Basic Union</option>
+                                    <option value="boolean">Boolean-based</option>
+                                    <option value="time">Time-based</option>
+                                    <option value="error">Error-based</option>
+                                </select>
+                            </div>
+                            <textarea id="custom-payload" placeholder="Or enter custom payload..." class="tool-textarea" rows="3"></textarea>
+                            <div class="tool-actions">
+                                <button class="tool-btn primary" onclick="testSQLInjection()">Test Injection</button>
+                                <button class="tool-btn secondary" onclick="generateSQLPayload()">Generate Payload</button>
+                            </div>
+                            <div class="sql-results" id="sql-results">
+                                <div class="result-header">SQL Injection Test Results:</div>
+                                <div class="result-content">Configure your test and click "Test Injection"</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card new-tool">
+                        <div class="tool-header">
+                            <div class="tool-icon">⚡</div>
+                            <h3>XSS Payload Generator</h3>
+                            <span class="new-badge">New</span>
+                        </div>
+                        <div class="tool-content">
+                            <div class="xss-config">
+                                <div class="config-row">
+                                    <label>Payload Type:</label>
+                                    <select id="xss-type" class="tool-select">
+                                        <option value="reflected">Reflected XSS</option>
+                                        <option value="stored">Stored XSS</option>
+                                        <option value="dom">DOM-based XSS</option>
+                                        <option value="blind">Blind XSS</option>
+                                    </select>
+                                </div>
+                                <div class="config-row">
+                                    <label>Bypass Method:</label>
+                                    <select id="xss-bypass" class="tool-select">
+                                        <option value="none">None</option>
+                                        <option value="encoding">HTML Encoding</option>
+                                        <option value="obfuscation">JavaScript Obfuscation</option>
+                                        <option value="filter">Filter Evasion</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="tool-actions">
+                                <button class="tool-btn primary" onclick="generateXSSPayload()">Generate Payload</button>
+                                <button class="tool-btn secondary" onclick="testXSSPayload()">Test Payload</button>
+                            </div>
+                            <div class="xss-results" id="xss-results">
+                                <div class="result-header">Generated XSS Payload:</div>
+                                <div class="result-content">Select options and click "Generate Payload"</div>
+                                <div class="payload-display" id="xss-payload-display" style="display: none;">
+                                    <textarea readonly class="generated-payload"></textarea>
+                                    <button class="copy-btn" onclick="copyToClipboard('xss-payload')">📋 Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card new-tool">
+                        <div class="tool-header">
+                            <div class="tool-icon">🤖</div>
+                            <h3>AI Prompt Injection Tester</h3>
+                            <span class="new-badge">2025</span>
+                        </div>
+                        <div class="tool-content">
+                            <textarea id="ai-prompt" placeholder="Enter the AI prompt or system message..." class="tool-textarea" rows="3"></textarea>
+                            <div class="injection-types">
+                                <label class="injection-option">
+                                    <input type="checkbox" checked> System Override
+                                </label>
+                                <label class="injection-option">
+                                    <input type="checkbox" checked> Role Confusion
+                                </label>
+                                <label class="injection-option">
+                                    <input type="checkbox"> Data Extraction
+                                </label>
+                                <label class="injection-option">
+                                    <input type="checkbox"> Jailbreak Attempts
+                                </label>
+                            </div>
+                            <div class="tool-actions">
+                                <button class="tool-btn primary" onclick="testAIPromptInjection()">Test Injection</button>
+                                <button class="tool-btn secondary" onclick="generateAIPayload()">Generate Payload</button>
+                            </div>
+                            <div class="ai-results" id="ai-results">
+                                <div class="result-header">AI Security Analysis:</div>
+                                <div class="result-content">Enter a prompt and select attack types to test...</div>
                             </div>
                         </div>
                     </div>
@@ -784,6 +985,28 @@
                         <div class="subject-meta">
                             <span class="steps-count">18 Steps</span>
                             <span class="time-estimate">~8 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card new-subject" data-difficulty="advanced" onclick="startTutorial('ai-security')">
+                        <div class="subject-header">
+                            <div class="subject-icon">🤖</div>
+                            <div class="difficulty-badge advanced">Advanced</div>
+                            <div class="new-badge">🆕 New</div>
+                        </div>
+                        <h3>AI & ML Security</h3>
+                        <p>Secure AI systems, prevent prompt injection, and red team machine learning models</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">22 Steps</span>
+                            <span class="time-estimate">~10 hours</span>
+                        </div>
+                        <div class="subject-highlights">
+                            <span class="highlight">🚨 Prompt Injection</span>
+                            <span class="highlight">🧠 Model Poisoning</span>
+                            <span class="highlight">🔍 AI Red Teaming</span>
                         </div>
                         <div class="progress-bar">
                             <div class="progress-fill" data-progress="0"></div>
@@ -1504,7 +1727,7 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <p>&copy; 2025 Bytrox by SuperduperCoders. Educational purposes only. Use ethically and responsibly. Last updated: October 2024</p>
+                <p>&copy; 2025 Bytrox by SuperduperCoders. Educational purposes only. Use ethically and responsibly. Last updated: October 2025 v2.2.0</p>
                 <div class="footer-links">
                     <span>🛡️ Always get proper authorization</span>
                     <span>📚 Learn responsibly</span>

@@ -2,6 +2,45 @@
 
 All notable changes to the Bytrox platform will be documented in this file.
 
+## [2.2.0] - 2025-10-18 (Latest Update)
+
+### ✨ Major New Features
+- 🤖 **NEW SUBJECT: AI & ML Security** - Comprehensive coverage of AI security, prompt injection, model poisoning, and AI red teaming
+- 💉 **Enhanced SQL Injection Tester** - Interactive tool with multiple payload types and real-time simulation
+- ⚡ **XSS Payload Generator** - Advanced cross-site scripting payload creation with bypass techniques  
+- 🤖 **AI Prompt Injection Tester** - 2025's cutting-edge tool for testing AI system security
+- 🚀 **Modernized Hero Section** - Floating cards, animated statistics, and interactive elements
+- 📊 **Animated Statistics** - Real-time counting animations for platform metrics
+
+### 🎨 Design Enhancements
+- ✨ Floating feature cards with staggered animations
+- 🌈 Gradient titles and enhanced visual hierarchy
+- 🎯 Quick start cards for immediate engagement
+- 🏷️ "New" badges for latest features and subjects
+- 📱 Improved mobile responsiveness and touch interactions
+- 🎭 Enhanced button styles with animated backgrounds
+
+### 🛠️ Interactive Improvements
+- 🔄 Intersection Observer for smooth scroll animations
+- 📋 Copy-to-clipboard functionality for generated payloads
+- 🔔 Smart notification system with success/error states
+- 🎮 Enhanced user interaction feedback
+- ⚡ Real-time tool simulations with educational focus
+
+### 📚 Educational Content
+- 🎓 22-step AI Security learning path
+- 🔍 Prompt injection attack vectors and defenses
+- 🧠 Machine learning model security concepts
+- 🛡️ AI red teaming methodologies
+- 📖 Updated subject highlights and learning paths
+
+### 🚀 Performance & UX
+- ⚡ Optimized animations with GPU acceleration
+- 🎯 Improved loading states and user feedback
+- 📊 Smart counter animations with intersection detection
+- 🔄 Debounced interactions for better performance
+- 🎨 CSS Grid layouts for better responsiveness
+
 ## [2.1.0] - 2025-10-18
 
 ### ✨ Added
