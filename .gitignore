@@ -5,6 +5,16 @@ yarn-debug.log*
 yarn-error.log*
 package-lock.json
 
+# Environment variables and secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+config.js
+secrets.js
+*.key
+
 # Runtime data
 pids
 *.pid

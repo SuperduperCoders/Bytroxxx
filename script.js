@@ -7740,11 +7740,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /* ================= BYTROX AI CHAT SYSTEM ================== */
 
-// AI Chat Configuration - Global scope
-window.AI_CONFIG = {
-    apiKey: 'AIzaSyDud0VbsC-0C9CjVt5F3vpJugbhKD5wYQQ',
-    apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
-};
+// AI Chat Configuration - Will be loaded from config.js
+// Note: config.js is not included in repository for security
+if (!window.AI_CONFIG) {
+    console.warn('AI_CONFIG not loaded. Please ensure config.js is present and contains valid API configuration.');
+    window.AI_CONFIG = {
+        apiKey: '', // This will be loaded from config.js
+        apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
+    };
+}
 
 // AI Chat State - Initialize immediately
 window.isAITyping = false;
@@ -7909,12 +7913,9 @@ function removeTypingIndicator() {
 async function getAIResponse(message) {
     console.log('Getting AI response for:', message);
     
-    // Ensure config is initialized
-    if (!window.AI_CONFIG) {
-        window.AI_CONFIG = {
-            apiKey: 'AIzaSyDud0VbsC-0C9CjVt5F3vpJugbhKD5wYQQ',
-            apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
-        };
+    // Check if config is properly loaded
+    if (!window.AI_CONFIG || !window.AI_CONFIG.apiKey || window.AI_CONFIG.apiKey === 'YOUR_GOOGLE_API_KEY_HERE') {
+        throw new Error('API configuration not properly set. Please check your config.js file.');
     }
     
     const requestBody = {
