@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bytrox Audio Test</title>
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #1a1a1a;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+        
+        .test-btn {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            margin: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .status {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: #2a2a2a;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎵 Bytrox Audio System Test</h1>
+        <p>Test the cyberpunk audio features!</p>
+        
+        <button class="test-btn" onclick="testClickSound()">Test Click Sound</button>
+        <button class="test-btn" onclick="testBackgroundMusic()">Toggle Background Music</button>
+        <button class="test-btn" onclick="testVolumeControl()">Test Volume Control</button>
+        
+        <div class="status" id="status">
+            Click any button to test audio functionality.
+        </div>
+    </div>
+
+    <script>
+        // Copy audio functions from main script
+        let audioEnabled = true;
+        let musicVolume = 0.3;
+        let sfxVolume = 0.5;
+        let backgroundMusicPlaying = false;
+
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+
+        function testClickSound() {
+            updateStatus('Playing click sound...');
+            createSyntheticClickSound();
+        }
+
+        function testBackgroundMusic() {
+            if (!backgroundMusicPlaying) {
+                updateStatus('Starting background music...');
+                if (window.startSyntheticMusic) {
+                    window.startSyntheticMusic();
+                } else {
+                    createSyntheticBackgroundMusic();
+                    setTimeout(() => window.startSyntheticMusic && window.startSyntheticMusic(), 100);
+                }
+                backgroundMusicPlaying = true;
+            } else {
+                updateStatus('Stopping background music...');
+                if (window.stopSyntheticMusic) {
+                    window.stopSyntheticMusic();
+                }
+                backgroundMusicPlaying = false;
+            }
+        }
+
+        function testVolumeControl() {
+            updateStatus('Testing volume control - playing quiet then loud click...');
+            sfxVolume = 0.1;
+            createSyntheticClickSound();
+            setTimeout(() => {
+                sfxVolume = 0.8;
+                createSyntheticClickSound();
+                setTimeout(() => {
+                    sfxVolume = 0.5; // Reset
+                    updateStatus('Volume test complete!');
+                }, 500);
+            }, 500);
+        }
+
+        // Copy the audio generation functions from main script
+        function createSyntheticClickSound() {
+            if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+                const AudioContextClass = AudioContext || webkitAudioContext;
+                let audioContext;
+                
+                try {
+                    audioContext = new AudioContextClass();
+                } catch (e) {
+                    updateStatus('Audio not supported in this browser');
+                    return;
+                }
+                
+                createClickLayer(audioContext, 1200, 0.02, 'sine');
+                createClickLayer(audioContext, 400, 0.03, 'square');
+                createClickLayer(audioContext, 100, 0.01, 'triangle');
+                createNoiseClick(audioContext);
+                
+                updateStatus('Click sound played successfully!');
+            }
+        }
+
+        function createClickLayer(audioContext, frequency, duration, type) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            const filter = audioContext.createBiquadFilter();
+            
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            filter.Q.setValueAtTime(5, audioContext.currentTime);
+            
+            oscillator.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = type;
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.3, audioContext.currentTime + duration);
+            
+            gainNode.gain.setValueAtTime(sfxVolume * 0.15, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        function createNoiseClick(audioContext) {
+            const bufferSize = audioContext.sampleRate * 0.02;
+            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const output = buffer.getChannelData(0);
+            
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1;
+            }
+            
+            const whiteNoise = audioContext.createBufferSource();
+            const gainNode = audioContext.createGain();
+            const filter = audioContext.createBiquadFilter();
+            
+            whiteNoise.buffer = buffer;
+            
+            filter.type = 'highpass';
+            filter.frequency.setValueAtTime(2000, audioContext.currentTime);
+            
+            whiteNoise.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            gainNode.gain.setValueAtTime(sfxVolume * 0.05, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
+            
+            whiteNoise.start(audioContext.currentTime);
+            whiteNoise.stop(audioContext.currentTime + 0.02);
+        }
+
+        // Initialize synthetic background music system
+        function createSyntheticBackgroundMusic() {
+            if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+                const AudioContextClass = AudioContext || webkitAudioContext;
+                let audioContext = null;
+                let musicNodes = { oscillators: [], gainNodes: [], filters: [] };
+                let isPlaying = false;
+                
+                function initAudioContext() {
+                    if (!audioContext) {
+                        audioContext = new AudioContextClass();
+                    }
+                    if (audioContext.state === 'suspended') {
+                        audioContext.resume();
+                    }
+                }
+                
+                function startSyntheticMusic() {
+                    if (isPlaying) return;
+                    
+                    initAudioContext();
+                    isPlaying = true;
+                    
+                    createAmbientLayer(55, 0.02);
+                    createAmbientLayer(110, 0.03);
+                    createAmbientLayer(220, 0.015);
+                }
+                
+                function createAmbientLayer(frequency, volume) {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    const filter = audioContext.createBiquadFilter();
+                    
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(frequency * 2, audioContext.currentTime);
+                    filter.Q.setValueAtTime(1, audioContext.currentTime);
+                    
+                    oscillator.connect(filter);
+                    filter.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                    
+                    const lfo = audioContext.createOscillator();
+                    const lfoGain = audioContext.createGain();
+                    lfo.type = 'triangle';
+                    lfo.frequency.setValueAtTime(0.05 + Math.random() * 0.1, audioContext.currentTime);
+                    lfoGain.gain.setValueAtTime(frequency * 0.02, audioContext.currentTime);
+                    lfo.connect(lfoGain);
+                    lfoGain.connect(oscillator.frequency);
+                    
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(musicVolume * volume, audioContext.currentTime + 3);
+                    
+                    oscillator.start();
+                    lfo.start();
+                    
+                    musicNodes.oscillators.push(oscillator, lfo);
+                    musicNodes.gainNodes.push(gainNode, lfoGain);
+                    musicNodes.filters.push(filter);
+                }
+                
+                function stopSyntheticMusic() {
+                    if (!isPlaying) return;
+                    
+                    isPlaying = false;
+                    
+                    musicNodes.gainNodes.forEach(gainNode => {
+                        try {
+                            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 2);
+                        } catch (e) {}
+                    });
+                    
+                    setTimeout(() => {
+                        musicNodes.oscillators.forEach(osc => {
+                            try { osc.stop(); } catch (e) {}
+                        });
+                        musicNodes.oscillators = [];
+                        musicNodes.gainNodes = [];
+                        musicNodes.filters = [];
+                    }, 2000);
+                }
+                
+                window.startSyntheticMusic = startSyntheticMusic;
+                window.stopSyntheticMusic = stopSyntheticMusic;
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            createSyntheticBackgroundMusic();
+            updateStatus('Audio system initialized. Ready for testing!');
+        });
+    </script>
+</body>
+</html>

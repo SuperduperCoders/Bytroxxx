@@ -8,6 +8,9 @@ const urlsToCache = [
     'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
 ];
 
+// Note: Assistant UI is implemented inline in index.html and script.js.
+// If you add external assistant assets later, include them above so they are cached.
+
 // Install event - cache resources
 self.addEventListener('install', (event) => {
     event.waitUntil(

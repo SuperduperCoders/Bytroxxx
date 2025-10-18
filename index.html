@@ -19,6 +19,18 @@
     <!-- Critical CSS -->
     <link rel="stylesheet" href="styles.css">
     
+    <!-- Audio files for sound effects and background music -->
+    <!-- Note: Audio will use Web Audio API for synthetic sounds as fallback -->
+    <audio id="backgroundMusic" loop preload="none" style="display: none;">
+        <!-- External audio sources removed for better performance and reliability -->
+        <!-- Will use synthetic Web Audio API sounds instead -->
+    </audio>
+    
+    <audio id="clickSound" preload="none" style="display: none;">
+        <!-- External audio sources removed for better performance and reliability -->
+        <!-- Will use synthetic Web Audio API sounds instead -->
+    </audio>
+    
     <!-- Optimized font loading -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
@@ -34,7 +46,7 @@
         "@type": "EducationalOrganization",
         "name": "Bytrox",
         "description": "Ethical Hacking Learning Platform",
-        "url": "https://bytrox.com",
+        "url": "https://superdupercoders.github.io/Bytroxxx/",
         "courseMode": "online",
         "educationalLevel": "beginner to advanced",
         "subject": "Cybersecurity and Ethical Hacking"
@@ -54,6 +66,7 @@
                 <a href="#tools" class="nav-link">Tools</a>
                 <a href="#subjects" class="nav-link">Subjects</a>
                 <a href="#achievements" class="nav-link">Achievements</a>
+                <a href="#ai-chat" class="nav-link">Bytrox AI</a>
                 <a href="#about" class="nav-link">About</a>
                 <div class="user-menu">
                     <button class="user-profile-btn" onclick="toggleUserProfile()" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
@@ -409,6 +422,8 @@
                         </div>
                     </div>
                     
+
+                    
                     <div class="subject-card" data-difficulty="intermediate" onclick="startTutorial('web-security')">
                         <div class="subject-header">
                             <div class="subject-icon">🌐</div>
@@ -692,6 +707,86 @@
                         <div class="achievement-status">🔒</div>
                     </div>
 
+                    <div class="achievement-card locked" data-id="first-perfect" data-category="skills" data-rarity="common" title="Score 100% on your first quiz">
+                        <div class="achievement-rarity rarity-common"></div>
+                        <div class="achievement-icon">💯</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Perfect Score</h3>
+                            <p class="achievement-description">Score 100% on your first quiz</p>
+                            <div class="achievement-tags">
+                                <span class="tag skills">Skills</span>
+                                <span class="tag common">Common</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/1</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <div class="achievement-card locked" data-id="quiz-expert" data-category="skills" data-rarity="epic" title="Score 100% on 10 quizzes">
+                        <div class="achievement-rarity rarity-epic"></div>
+                        <div class="achievement-icon">🎓</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Quiz Expert</h3>
+                            <p class="achievement-description">Score 100% on 10 quizzes</p>
+                            <div class="achievement-tags">
+                                <span class="tag skills">Skills</span>
+                                <span class="tag epic">Epic</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/10</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <div class="achievement-card locked" data-id="high-achiever" data-category="skills" data-rarity="rare" title="Maintain 90%+ average across 3+ subjects">
+                        <div class="achievement-rarity rarity-rare"></div>
+                        <div class="achievement-icon">⭐</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">High Achiever</h3>
+                            <p class="achievement-description">Maintain 90%+ average across 3+ subjects</p>
+                            <div class="achievement-tags">
+                                <span class="tag skills">Skills</span>
+                                <span class="tag rare">Rare</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/1</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
+                    <div class="achievement-card locked" data-id="persistent-learner" data-category="skills" data-rarity="common" title="Take 5 quizzes in the same subject">
+                        <div class="achievement-rarity rarity-common"></div>
+                        <div class="achievement-icon">🔄</div>
+                        <div class="achievement-info">
+                            <h3 class="achievement-name">Persistent Learner</h3>
+                            <p class="achievement-description">Take 5 quizzes in the same subject</p>
+                            <div class="achievement-tags">
+                                <span class="tag skills">Skills</span>
+                                <span class="tag common">Common</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text">0/5</span>
+                            </div>
+                        </div>
+                        <div class="achievement-status">🔒</div>
+                    </div>
+
                     <div class="achievement-card locked" data-id="penetration-tester" data-category="skills" data-rarity="epic" title="Complete all penetration testing subjects">
                         <div class="achievement-rarity rarity-epic"></div>
                         <div class="achievement-icon">🎯</div>
@@ -926,6 +1021,79 @@
             </div>
         </section>
 
+        <!-- AI Chat Section (Hidden by default) -->
+        <section id="ai-chat" class="ai-chat-section" style="display: none;">
+            <div class="container">
+                <div class="ai-chat-header">
+                    <h2 class="section-title">
+                        <span class="ai-icon">🤖</span>
+                        Bytrox AI Assistant
+                    </h2>
+                    <p class="ai-description">Ask me anything about ethical hacking, cybersecurity, or any topic you need help with!</p>
+                </div>
+                
+                <div class="ai-chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message ai-message">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                <p>Hello! I'm Bytrox AI, your personal cybersecurity assistant. I'm here to help you learn ethical hacking, answer your questions about cybersecurity concepts, or assist with any other topics. What would you like to know?</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <div class="input-group">
+                            <input type="text" id="user-input" class="chat-input" placeholder="Ask me anything..." maxlength="1000" autocomplete="off">
+                            <button id="send-button" class="send-button" onclick="sendMessage()" title="Send message">
+                                <span class="send-icon">➤</span>
+                            </button>
+                        </div>
+                        <div class="input-actions">
+                            <button class="action-button" onclick="clearChat()" title="Clear chat history">
+                                <span>🗑️</span> Clear Chat
+                            </button>
+                            <button class="action-button" onclick="showAIExamples()" title="Show example questions">
+                                <span>💡</span> Examples
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Example Questions Modal -->
+                <div id="ai-examples-modal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Example Questions</h3>
+                            <button class="close-modal" onclick="closeAIExamples()">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="examples-grid">
+                                <button class="example-question" onclick="useExample('What is SQL injection and how can I prevent it?')">
+                                    What is SQL injection and how can I prevent it?
+                                </button>
+                                <button class="example-question" onclick="useExample('Explain the difference between white hat and black hat hacking')">
+                                    Explain the difference between white hat and black hat hacking
+                                </button>
+                                <button class="example-question" onclick="useExample('How does penetration testing work?')">
+                                    How does penetration testing work?
+                                </button>
+                                <button class="example-question" onclick="useExample('What are the best tools for network security scanning?')">
+                                    What are the best tools for network security scanning?
+                                </button>
+                                <button class="example-question" onclick="useExample('How can I secure my web application?')">
+                                    How can I secure my web application?
+                                </button>
+                                <button class="example-question" onclick="useExample('What is social engineering in cybersecurity?')">
+                                    What is social engineering in cybersecurity?
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Tutorial Section (Hidden by default) -->
         <section id="tutorial" class="tutorial-section" style="display: none;">
             <div class="container">
@@ -949,8 +1117,11 @@
                             <div id="quiz-section" class="quiz-section" style="display: none;">
                                 <div class="quiz-header">
                                     <h4>🧠 Quick Knowledge Check</h4>
-                                    <div class="quiz-progress">
-                                        Question <span id="quiz-current">1</span> of <span id="quiz-total">3</span>
+                                    <div class="quiz-header-right">
+                                        <div class="quiz-progress">
+                                            Question <span id="quiz-current">1</span> of <span id="quiz-total">3</span>
+                                        </div>
+                                        <button class="quiz-close-btn" onclick="closeQuiz()" title="Close quiz">×</button>
                                     </div>
                                 </div>
                                 <div class="quiz-content">
@@ -969,6 +1140,7 @@
                                     <button id="quiz-submit" class="quiz-btn primary" style="display: none;">Submit Answer</button>
                                     <button id="quiz-next" class="quiz-btn primary" style="display: none;">Next Question</button>
                                     <button id="quiz-complete" class="quiz-btn success" style="display: none;">Complete Quiz</button>
+                                    <button id="quiz-restart" class="quiz-btn secondary" onclick="restartQuiz()" style="display: none;">Restart Quiz</button>
                                 </div>
                             </div>
                             
@@ -1071,6 +1243,9 @@
                         <button class="action-button" onclick="bookmarkStep()">
                             📌 Bookmark
                         </button>
+                        <button class="action-button" onclick="startQuiz(currentSubject)" id="quiz-btn">
+                            🧠 Take Quiz
+                        </button>
                     </div>
                     <button id="next-button" class="nav-button primary" onclick="nextStep()">Next</button>
                 </div>
@@ -1098,40 +1273,7 @@
         <div class="loading-spinner"></div>
     </div>
 
-    <!-- Chat Bot -->
-    <div class="chat-bot" id="chat-bot">
-        <div class="chat-header">
-            <div class="chat-avatar">🤖</div>
-            <div class="chat-info">
-                <h4>BytroxAI Assistant</h4>
-                <span class="status online">Online</span>
-            </div>
-            <button class="chat-close" onclick="toggleChat()">×</button>
-        </div>
-        <div class="chat-messages" id="chat-messages">
-            <div class="message bot">
-                <div class="message-content">
-                    <p>Hi! I'm your AI assistant. I can help you with ethical hacking concepts, answer questions, and guide you through tutorials. What would you like to learn today?</p>
-                </div>
-                <div class="message-time">Now</div>
-            </div>
-        </div>
-        <div class="chat-input">
-            <input type="text" id="chat-input-field" placeholder="Ask me about ethical hacking..." onkeypress="handleChatKeyPress(event)">
-            <button class="chat-send" onclick="sendChatMessage()">📤</button>
-        </div>
-        <div class="chat-suggestions">
-            <button class="suggestion-btn" onclick="askPresetQuestion('What is SQL injection?')">What is SQL injection?</button>
-            <button class="suggestion-btn" onclick="askPresetQuestion('How to start with pentesting?')">How to start with pentesting?</button>
-            <button class="suggestion-btn" onclick="askPresetQuestion('Best ethical hacking tools?')">Best ethical hacking tools?</button>
-        </div>
-    </div>
 
-    <!-- Chat Toggle Button -->
-    <button class="chat-toggle" id="chat-toggle" onclick="toggleChat()">
-        <span class="chat-icon">💬</span>
-        <span class="notification-badge" id="chat-notification" style="display: none;">1</span>
-    </button>
 
     <!-- User Profile Modal -->
     <div class="modal" id="profile-modal" style="display: none;">
@@ -1302,6 +1444,8 @@
         </div>
         <button class="achievement-close" onclick="closeAchievement()">×</button>
     </div>
+
+
 
     <script src="script.js"></script>
 </body>

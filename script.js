@@ -6,6 +6,13 @@ let userProgress = JSON.parse(localStorage.getItem('bytroxProgress')) || {};
 let achievements = JSON.parse(localStorage.getItem('bytroxAchievements')) || [];
 let particles = [];
 
+// Audio system
+let backgroundMusic = null;
+let clickSound = null;
+let audioEnabled = JSON.parse(localStorage.getItem('bytroxAudioEnabled')) || false;
+let musicVolume = parseFloat(localStorage.getItem('bytroxMusicVolume')) || 0.3;
+let sfxVolume = parseFloat(localStorage.getItem('bytroxSfxVolume')) || 0.5;
+
 // Performance optimizations
 let animationFrameId = null;
 let searchTimeout = null;
@@ -35,6 +42,498 @@ function throttle(func, limit) {
             setTimeout(() => inThrottle = false, limit);
         }
     }
+}
+
+// Audio System Functions
+function initializeAudio() {
+    // Always use synthetic audio for better compatibility and performance
+    console.log('Initializing Bytrox Audio System with Web Audio API');
+    
+    // Initialize synthetic audio system
+    createSyntheticBackgroundMusic();
+    
+    // Auto-play background music if enabled
+    if (audioEnabled) {
+        // Delay to allow user interaction (required for Web Audio)
+        setTimeout(() => {
+            playBackgroundMusic();
+        }, 1000);
+    }
+    
+    // Add audio controls to the page
+    createAudioControls();
+    
+    // Add visual audio indicator
+    createAudioVisualizer();
+}
+
+function createSyntheticBackgroundMusic() {
+    // Create a Web Audio API context for synthetic background music
+    if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+        const AudioContextClass = AudioContext || webkitAudioContext;
+        let audioContext = null;
+        let musicNodes = {
+            oscillators: [],
+            gainNodes: [],
+            filters: []
+        };
+        let isPlaying = false;
+        
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new AudioContextClass();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+        
+        function startSyntheticMusic() {
+            if (!audioEnabled || isPlaying) return;
+            
+            initAudioContext();
+            isPlaying = true;
+            
+            // Create multiple layers for a richer cyberpunk ambient sound
+            createAmbientLayer(55, 0.02); // Sub bass
+            createAmbientLayer(110, 0.03); // Bass
+            createAmbientLayer(220, 0.015); // Mid
+            createPadLayer(440, 0.01); // High pad
+            
+            // Add subtle rhythmic pulse
+            createPulseLayer();
+        }
+        
+        function createAmbientLayer(frequency, volume) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            const filter = audioContext.createBiquadFilter();
+            
+            // Setup filter
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(frequency * 2, audioContext.currentTime);
+            filter.Q.setValueAtTime(1, audioContext.currentTime);
+            
+            // Connect nodes
+            oscillator.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Configure oscillator
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            
+            // Add subtle frequency modulation
+            const lfo = audioContext.createOscillator();
+            const lfoGain = audioContext.createGain();
+            lfo.type = 'triangle';
+            lfo.frequency.setValueAtTime(0.05 + Math.random() * 0.1, audioContext.currentTime);
+            lfoGain.gain.setValueAtTime(frequency * 0.02, audioContext.currentTime);
+            lfo.connect(lfoGain);
+            lfoGain.connect(oscillator.frequency);
+            
+            // Setup gain envelope
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(musicVolume * volume, audioContext.currentTime + 3);
+            
+            // Start oscillators
+            oscillator.start();
+            lfo.start();
+            
+            // Store references
+            musicNodes.oscillators.push(oscillator, lfo);
+            musicNodes.gainNodes.push(gainNode, lfoGain);
+            musicNodes.filters.push(filter);
+        }
+        
+        function createPadLayer(frequency, volume) {
+            const oscillator1 = audioContext.createOscillator();
+            const oscillator2 = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            const filter = audioContext.createBiquadFilter();
+            
+            // Slightly detuned oscillators for chorus effect
+            oscillator1.type = 'sawtooth';
+            oscillator2.type = 'sawtooth';
+            oscillator1.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator2.frequency.setValueAtTime(frequency * 1.005, audioContext.currentTime);
+            
+            // Setup filter
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(frequency * 1.5, audioContext.currentTime);
+            filter.Q.setValueAtTime(2, audioContext.currentTime);
+            
+            // Connect
+            oscillator1.connect(filter);
+            oscillator2.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Envelope
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(musicVolume * volume, audioContext.currentTime + 4);
+            
+            oscillator1.start();
+            oscillator2.start();
+            
+            musicNodes.oscillators.push(oscillator1, oscillator2);
+            musicNodes.gainNodes.push(gainNode);
+            musicNodes.filters.push(filter);
+        }
+        
+        function createPulseLayer() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            const pulseGain = audioContext.createGain();
+            
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(55, audioContext.currentTime);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(pulseGain);
+            pulseGain.connect(audioContext.destination);
+            
+            // Create pulse pattern
+            gainNode.gain.setValueAtTime(musicVolume * 0.005, audioContext.currentTime);
+            
+            // Pulse LFO
+            const pulseLfo = audioContext.createOscillator();
+            const pulseLfoGain = audioContext.createGain();
+            pulseLfo.type = 'square';
+            pulseLfo.frequency.setValueAtTime(0.25, audioContext.currentTime); // 4-second cycle
+            pulseLfoGain.gain.setValueAtTime(musicVolume * 0.003, audioContext.currentTime);
+            pulseLfo.connect(pulseLfoGain);
+            pulseLfoGain.connect(pulseGain.gain);
+            
+            oscillator.start();
+            pulseLfo.start();
+            
+            musicNodes.oscillators.push(oscillator, pulseLfo);
+            musicNodes.gainNodes.push(gainNode, pulseLfoGain, pulseGain);
+        }
+        
+        function stopSyntheticMusic() {
+            if (!isPlaying) return;
+            
+            isPlaying = false;
+            
+            // Fade out all gain nodes
+            musicNodes.gainNodes.forEach(gainNode => {
+                try {
+                    gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 2);
+                } catch (e) {
+                    // Handle gain nodes that might be LFO gains
+                }
+            });
+            
+            // Stop all oscillators after fade
+            setTimeout(() => {
+                musicNodes.oscillators.forEach(osc => {
+                    try {
+                        osc.stop();
+                    } catch (e) {
+                        // Oscillator might already be stopped
+                    }
+                });
+                
+                // Clear arrays
+                musicNodes.oscillators = [];
+                musicNodes.gainNodes = [];
+                musicNodes.filters = [];
+            }, 2000);
+        }
+        
+        // Replace background music methods
+        window.startSyntheticMusic = startSyntheticMusic;
+        window.stopSyntheticMusic = stopSyntheticMusic;
+    }
+}
+
+function playClickSound() {
+    if (!audioEnabled) return;
+    
+    // Always use synthetic click sound for consistency and reliability
+    createSyntheticClickSound();
+}
+
+function createSyntheticClickSound() {
+    if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+        const AudioContextClass = AudioContext || webkitAudioContext;
+        let audioContext;
+        
+        try {
+            audioContext = new AudioContextClass();
+        } catch (e) {
+            return; // Audio not supported
+        }
+        
+        // Create a more sophisticated click sound with multiple layers
+        createClickLayer(audioContext, 1200, 0.02, 'sine'); // High ping
+        createClickLayer(audioContext, 400, 0.03, 'square'); // Mid click
+        createClickLayer(audioContext, 100, 0.01, 'triangle'); // Low thump
+        
+        // Add noise burst for texture
+        createNoiseClick(audioContext);
+    }
+}
+
+function createClickLayer(audioContext, frequency, duration, type) {
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    const filter = audioContext.createBiquadFilter();
+    
+    // Setup filter
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(frequency, audioContext.currentTime);
+    filter.Q.setValueAtTime(5, audioContext.currentTime);
+    
+    // Connect nodes
+    oscillator.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    // Configure oscillator
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.3, audioContext.currentTime + duration);
+    
+    // Setup gain envelope
+    gainNode.gain.setValueAtTime(sfxVolume * 0.15, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + duration);
+}
+
+function createNoiseClick(audioContext) {
+    const bufferSize = audioContext.sampleRate * 0.02; // 20ms
+    const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+    const output = buffer.getChannelData(0);
+    
+    // Generate white noise
+    for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+    }
+    
+    const whiteNoise = audioContext.createBufferSource();
+    const gainNode = audioContext.createGain();
+    const filter = audioContext.createBiquadFilter();
+    
+    whiteNoise.buffer = buffer;
+    
+    // High-pass filter for crisp click
+    filter.type = 'highpass';
+    filter.frequency.setValueAtTime(2000, audioContext.currentTime);
+    
+    whiteNoise.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    // Quick noise burst
+    gainNode.gain.setValueAtTime(sfxVolume * 0.05, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
+    
+    whiteNoise.start(audioContext.currentTime);
+    whiteNoise.stop(audioContext.currentTime + 0.02);
+}
+
+function playBackgroundMusic() {
+    if (!audioEnabled) return;
+    
+    // Always use synthetic music for reliability
+    if (window.startSyntheticMusic) {
+        window.startSyntheticMusic();
+    }
+}
+
+function stopBackgroundMusic() {
+    // Always use synthetic music
+    if (window.stopSyntheticMusic) {
+        window.stopSyntheticMusic();
+    }
+}
+
+function toggleAudio() {
+    audioEnabled = !audioEnabled;
+    localStorage.setItem('bytroxAudioEnabled', JSON.stringify(audioEnabled));
+    
+    if (audioEnabled) {
+        playBackgroundMusic();
+        // Show notification for first-time users
+        if (!localStorage.getItem('bytroxAudioNotificationShown')) {
+            showNotification('🎵 Audio enabled! Enjoy the cyberpunk atmosphere with background music and click sounds.', 'success');
+            localStorage.setItem('bytroxAudioNotificationShown', 'true');
+        }
+    } else {
+        stopBackgroundMusic();
+        showNotification('🔇 Audio disabled', 'info');
+    }
+    
+    updateAudioControlsUI();
+}
+
+function setMusicVolume(volume) {
+    musicVolume = Math.max(0, Math.min(1, volume));
+    localStorage.setItem('bytroxMusicVolume', musicVolume.toString());
+    
+    if (backgroundMusic) {
+        backgroundMusic.volume = musicVolume;
+    }
+}
+
+function setSfxVolume(volume) {
+    sfxVolume = Math.max(0, Math.min(1, volume));
+    localStorage.setItem('bytroxSfxVolume', sfxVolume.toString());
+    
+    if (clickSound) {
+        clickSound.volume = sfxVolume;
+    }
+}
+
+function createAudioControls() {
+    // Create audio control panel
+    const audioControls = document.createElement('div');
+    audioControls.className = 'audio-controls';
+    audioControls.innerHTML = `
+        <div class="audio-controls-content">
+            <h3>🎵 Audio Settings</h3>
+            <div class="audio-toggle">
+                <label>
+                    <input type="checkbox" id="audioToggle" ${audioEnabled ? 'checked' : ''}>
+                    Enable Audio
+                </label>
+            </div>
+            <div class="volume-controls">
+                <div class="volume-control">
+                    <label for="musicVolume">Music Volume:</label>
+                    <input type="range" id="musicVolume" min="0" max="1" step="0.1" value="${musicVolume}">
+                    <span class="volume-value">${Math.round(musicVolume * 100)}%</span>
+                </div>
+                <div class="volume-control">
+                    <label for="sfxVolume">SFX Volume:</label>
+                    <input type="range" id="sfxVolume" min="0" max="1" step="0.1" value="${sfxVolume}">
+                    <span class="volume-value">${Math.round(sfxVolume * 100)}%</span>
+                </div>
+            </div>
+            <button class="audio-controls-close">×</button>
+        </div>
+    `;
+    
+    document.body.appendChild(audioControls);
+    
+    // Add event listeners
+    document.getElementById('audioToggle').addEventListener('change', toggleAudio);
+    
+    document.getElementById('musicVolume').addEventListener('input', (e) => {
+        setMusicVolume(parseFloat(e.target.value));
+        e.target.nextElementSibling.textContent = Math.round(e.target.value * 100) + '%';
+    });
+    
+    document.getElementById('sfxVolume').addEventListener('input', (e) => {
+        setSfxVolume(parseFloat(e.target.value));
+        e.target.nextElementSibling.textContent = Math.round(e.target.value * 100) + '%';
+    });
+    
+    document.querySelector('.audio-controls-close').addEventListener('click', () => {
+        audioControls.style.display = 'none';
+    });
+    
+    // Create floating audio button
+    const audioButton = document.createElement('button');
+    audioButton.className = 'floating-audio-btn';
+    audioButton.innerHTML = audioEnabled ? '🔊' : '🔇';
+    audioButton.title = 'Audio Settings';
+    audioButton.addEventListener('click', () => {
+        audioControls.style.display = audioControls.style.display === 'none' ? 'block' : 'none';
+    });
+    
+    document.body.appendChild(audioButton);
+    
+    window.audioControlsPanel = audioControls;
+    window.audioButton = audioButton;
+}
+
+function updateAudioControlsUI() {
+    if (window.audioButton) {
+        window.audioButton.innerHTML = audioEnabled ? '🔊' : '🔇';
+        window.audioButton.classList.toggle('audio-active', audioEnabled);
+    }
+}
+
+function createAudioVisualizer() {
+    const visualizer = document.createElement('div');
+    visualizer.className = 'audio-visualizer';
+    visualizer.innerHTML = `
+        <div class="audio-wave">
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+        </div>
+    `;
+    
+    // Add to floating audio button
+    if (window.audioButton) {
+        window.audioButton.appendChild(visualizer);
+    }
+    
+    // Animate visualizer when audio is active
+    function animateVisualizer() {
+        if (audioEnabled) {
+            const bars = visualizer.querySelectorAll('.wave-bar');
+            bars.forEach((bar, index) => {
+                const height = Math.random() * 60 + 20;
+                const delay = index * 100;
+                setTimeout(() => {
+                    bar.style.height = height + '%';
+                }, delay);
+            });
+        }
+    }
+    
+    // Update visualizer every 200ms when audio is enabled
+    setInterval(() => {
+        if (audioEnabled) {
+            animateVisualizer();
+        }
+    }, 200);
+}
+
+function addUniversalClickSounds() {
+    // Add click sound to all buttons
+    document.querySelectorAll('button:not(.audio-controls button):not(.floating-audio-btn)').forEach(button => {
+        button.addEventListener('click', playClickSound);
+    });
+    
+    // Add click sound to clickable elements with onclick attributes
+    document.querySelectorAll('[onclick]').forEach(element => {
+        element.addEventListener('click', playClickSound);
+    });
+    
+    // Add click sound to navigation links and interactive elements
+    document.querySelectorAll('a, .clickable, .interactive, .nav-item').forEach(element => {
+        element.addEventListener('click', playClickSound);
+    });
+    
+    // Add click sound to subject cards specifically
+    document.querySelectorAll('.subject-card').forEach(card => {
+        card.addEventListener('click', playClickSound);
+    });
+    
+    // Add click sound to tool buttons
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+        btn.addEventListener('click', playClickSound);
+    });
+    
+    // Add click sound to CTA buttons
+    document.querySelectorAll('.cta-button').forEach(btn => {
+        btn.addEventListener('click', playClickSound);
+    });
+    
+    // Add click sound to filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', playClickSound);
+    });
 }
 
 // Optimized particles system with performance monitoring
@@ -198,6 +697,9 @@ function enhanceSubjectCards() {
         
         // Add click ripple effect
         card.addEventListener('click', (e) => {
+            // Play click sound
+            playClickSound();
+            
             const ripple = document.createElement('div');
             const rect = card.getBoundingClientRect();
             const size = Math.max(rect.width, rect.height);
@@ -348,6 +850,9 @@ function initializeAchievementFilters() {
     // Filter buttons
     document.querySelectorAll('.achievement-filters .filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
+            // Play click sound
+            playClickSound();
+            
             // Update active filter
             document.querySelectorAll('.achievement-filters .filter-btn').forEach(b => {
                 b.classList.remove('active');
@@ -371,6 +876,8 @@ function initializeAchievementFilters() {
     // Achievement card click handlers
     document.querySelectorAll('.achievement-card').forEach(card => {
         card.addEventListener('click', function() {
+            // Play click sound
+            playClickSound();
             showAchievementModal(this);
         });
     });
@@ -601,6 +1108,12 @@ function animateNumber(elementId, targetValue, suffix = '') {
 
 // Initialize achievement system when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize audio system
+    initializeAudio();
+    
+    // Add universal click sound to all buttons and interactive elements
+    addUniversalClickSounds();
+    
     if (document.getElementById('achievements')) {
         initializeAchievementFilters();
         updateAchievementStats();
@@ -3909,9 +4422,6 @@ document.addEventListener('keydown', function(e) {
     
     if (e.key === 'Escape') {
         closeAllModals();
-        if (document.getElementById('chat-bot').classList.contains('open')) {
-            toggleChat();
-        }
     }
 });
 
@@ -4412,18 +4922,454 @@ const quizData = {
             options: ["Exploit vulnerabilities", "Gather information", "Gain access", "Delete files"],
             correct: 1,
             explanation: "The primary goal of reconnaissance is to gather as much information as possible about the target."
+        },
+        {
+            question: "Which command can be used to find subdomains?",
+            options: ["ping", "traceroute", "dig", "netstat"],
+            correct: 2,
+            explanation: "The dig command can be used to query DNS records and find subdomains."
+        },
+        {
+            question: "What type of reconnaissance involves direct interaction with the target?",
+            options: ["Passive reconnaissance", "Active reconnaissance", "Social reconnaissance", "Physical reconnaissance"],
+            correct: 1,
+            explanation: "Active reconnaissance involves direct interaction with the target system, such as port scanning."
+        }
+    ],
+    cryptography: [
+        {
+            question: "What is the main purpose of encryption?",
+            options: ["To compress data", "To protect data confidentiality", "To speed up transmission", "To organize files"],
+            correct: 1,
+            explanation: "Encryption is primarily used to protect data confidentiality by making it unreadable to unauthorized users."
+        },
+        {
+            question: "Which of these is a symmetric encryption algorithm?",
+            options: ["RSA", "AES", "ECC", "DSA"],
+            correct: 1,
+            explanation: "AES (Advanced Encryption Standard) is a symmetric encryption algorithm where the same key is used for encryption and decryption."
+        },
+        {
+            question: "What does a hash function provide?",
+            options: ["Confidentiality", "Data integrity", "Authentication", "Authorization"],
+            correct: 1,
+            explanation: "Hash functions provide data integrity by creating a unique fingerprint of data that changes if the data is modified."
+        },
+        {
+            question: "Which is stronger: MD5 or SHA-256?",
+            options: ["MD5", "SHA-256", "They are equal", "It depends on implementation"],
+            correct: 1,
+            explanation: "SHA-256 is much stronger than MD5. MD5 has known vulnerabilities and should not be used for security purposes."
+        },
+        {
+            question: "In RSA, what makes the private key private?",
+            options: ["It's shorter", "It's kept secret", "It's generated randomly", "It's encrypted"],
+            correct: 1,
+            explanation: "The private key must be kept secret and known only to its owner for RSA to provide security."
+        }
+    ],
+    'incident-response': [
+        {
+            question: "What is the first phase of incident response?",
+            options: ["Containment", "Preparation", "Detection", "Recovery"],
+            correct: 1,
+            explanation: "Preparation is the first phase where organizations establish policies, procedures, and tools for incident response."
+        },
+        {
+            question: "What should you do first when a security incident is detected?",
+            options: ["Delete all evidence", "Shut down all systems", "Document the incident", "Call the police"],
+            correct: 2,
+            explanation: "Documentation is crucial for proper incident response and legal requirements."
+        },
+        {
+            question: "What is the purpose of containment in incident response?",
+            options: ["To gather evidence", "To prevent further damage", "To identify the attacker", "To restore systems"],
+            correct: 1,
+            explanation: "Containment aims to prevent the incident from spreading and causing further damage."
+        },
+        {
+            question: "Which tool is commonly used for digital forensics?",
+            options: ["Wireshark", "EnCase", "Burp Suite", "Metasploit"],
+            correct: 1,
+            explanation: "EnCase is a widely used digital forensics tool for investigating security incidents."
+        },
+        {
+            question: "What is a playbook in incident response?",
+            options: ["A game manual", "A predetermined response plan", "A forensic tool", "A type of malware"],
+            correct: 1,
+            explanation: "A playbook is a predetermined response plan that outlines steps to take for specific types of incidents."
+        }
+    ],
+    'vulnerability-assessment': [
+        {
+            question: "What is the difference between a vulnerability and an exploit?",
+            options: ["No difference", "Vulnerability is a weakness, exploit takes advantage of it", "Exploit is weaker", "Vulnerability is theoretical"],
+            correct: 1,
+            explanation: "A vulnerability is a weakness in a system, while an exploit is code or technique that takes advantage of that weakness."
+        },
+        {
+            question: "What does CVSS stand for?",
+            options: ["Common Vulnerability Scoring System", "Cyber Vulnerability Security Standard", "Critical Vulnerability Support System", "Computer Virus Scanning System"],
+            correct: 0,
+            explanation: "CVSS stands for Common Vulnerability Scoring System, used to rate the severity of vulnerabilities."
+        },
+        {
+            question: "Which vulnerability scanner is open source?",
+            options: ["Nessus", "Qualys", "OpenVAS", "Rapid7"],
+            correct: 2,
+            explanation: "OpenVAS is an open-source vulnerability scanner, while the others are commercial products."
+        },
+        {
+            question: "What CVSS score indicates a critical vulnerability?",
+            options: ["1.0-3.9", "4.0-6.9", "7.0-8.9", "9.0-10.0"],
+            correct: 3,
+            explanation: "CVSS scores of 9.0-10.0 indicate critical vulnerabilities that should be addressed immediately."
+        },
+        {
+            question: "What is a false positive in vulnerability scanning?",
+            options: ["A missed vulnerability", "A correctly identified vulnerability", "An incorrectly reported vulnerability", "A new vulnerability"],
+            correct: 2,
+            explanation: "A false positive is when a scanner incorrectly reports a vulnerability that doesn't actually exist."
+        }
+    ],
+    'penetration-testing': [
+        {
+            question: "What are the main phases of penetration testing?",
+            options: ["Plan, Scan, Attack", "Reconnaissance, Scanning, Exploitation, Post-exploitation", "Connect, Probe, Break", "Test, Verify, Report"],
+            correct: 1,
+            explanation: "The main phases are Reconnaissance, Scanning, Exploitation, and Post-exploitation, following a systematic approach."
+        },
+        {
+            question: "What is the difference between black box and white box testing?",
+            options: ["Color of the test environment", "Knowledge available to the tester", "Type of vulnerabilities tested", "Tools used"],
+            correct: 1,
+            explanation: "Black box testing has no prior knowledge of the system, while white box testing has full knowledge of the system architecture."
+        },
+        {
+            question: "What framework is commonly used for penetration testing?",
+            options: ["NIST", "OWASP", "PTES", "ISO 27001"],
+            correct: 2,
+            explanation: "PTES (Penetration Testing Execution Standard) is a comprehensive framework specifically for penetration testing."
+        },
+        {
+            question: "What should be included in a penetration test report?",
+            options: ["Only vulnerabilities found", "Only successful exploits", "Executive summary, findings, and recommendations", "Technical details only"],
+            correct: 2,
+            explanation: "A proper pentest report should include an executive summary, detailed findings, risk ratings, and remediation recommendations."
+        },
+        {
+            question: "What is privilege escalation?",
+            options: ["Getting initial access", "Gaining higher-level permissions", "Lateral movement", "Data exfiltration"],
+            correct: 1,
+            explanation: "Privilege escalation is the process of gaining higher-level permissions than initially obtained, often to gain administrative access."
+        }
+    ],
+    'social-engineering': [
+        {
+            question: "What is pretexting in social engineering?",
+            options: ["Sending fake emails", "Creating a false scenario to gain trust", "Physical break-in", "Password cracking"],
+            correct: 1,
+            explanation: "Pretexting involves creating a fabricated scenario to build trust and extract information from victims."
+        },
+        {
+            question: "Which principle of persuasion involves people wanting to be consistent?",
+            options: ["Reciprocity", "Commitment", "Authority", "Scarcity"],
+            correct: 1,
+            explanation: "The commitment/consistency principle states that people want to be consistent with their previous actions and commitments."
+        },
+        {
+            question: "What is vishing?",
+            options: ["Video phishing", "Voice phishing", "Virtual phishing", "Virus phishing"],
+            correct: 1,
+            explanation: "Vishing is voice phishing - using phone calls to extract sensitive information from victims."
+        },
+        {
+            question: "What is the best defense against social engineering?",
+            options: ["Strong passwords", "Antivirus software", "Security awareness training", "Firewalls"],
+            correct: 2,
+            explanation: "Security awareness training is the most effective defense as it educates users to recognize and respond to social engineering attempts."
+        },
+        {
+            question: "What is tailgating in physical security?",
+            options: ["Following someone's car", "Following someone through a secure door", "Monitoring someone's activities", "Stealing someone's identity"],
+            correct: 1,
+            explanation: "Tailgating is following an authorized person through a secure door or checkpoint without proper authorization."
+        }
+    ],
+    'web-security': [
+        {
+            question: "What does XSS stand for?",
+            options: ["Cross-Site Scripting", "External Security System", "Extended Security Standard", "Cross-Server Synchronization"],
+            correct: 0,
+            explanation: "XSS stands for Cross-Site Scripting, a vulnerability that allows attackers to inject malicious scripts into web pages."
+        },
+        {
+            question: "What is SQL injection?",
+            options: ["Injecting SQL into databases", "A technique to exploit database queries", "A way to optimize databases", "A backup method"],
+            correct: 1,
+            explanation: "SQL injection is a technique where attackers manipulate SQL queries by injecting malicious SQL code through user inputs."
+        },
+        {
+            question: "What does CSRF stand for?",
+            options: ["Cross-Site Request Forgery", "Cyber Security Risk Framework", "Client-Server Request Failure", "Cross-System Resource Failure"],
+            correct: 0,
+            explanation: "CSRF stands for Cross-Site Request Forgery, an attack that forces users to execute unwanted actions on authenticated web applications."
+        },
+        {
+            question: "Which HTTP header helps prevent XSS attacks?",
+            options: ["Content-Type", "Content-Security-Policy", "Accept-Encoding", "User-Agent"],
+            correct: 1,
+            explanation: "Content-Security-Policy (CSP) header helps prevent XSS attacks by controlling which resources can be loaded and executed."
+        },
+        {
+            question: "What is the OWASP Top 10?",
+            options: ["Top 10 security tools", "Top 10 web vulnerabilities", "Top 10 hackers", "Top 10 security companies"],
+            correct: 1,
+            explanation: "The OWASP Top 10 is a list of the most critical web application security vulnerabilities."
+        }
+    ],
+    'network-security': [
+        {
+            question: "What port does SSH typically use?",
+            options: ["21", "22", "23", "25"],
+            correct: 1,
+            explanation: "SSH (Secure Shell) typically uses port 22 for secure remote access."
+        },
+        {
+            question: "What is the purpose of a firewall?",
+            options: ["To encrypt data", "To filter network traffic", "To store passwords", "To scan for malware"],
+            correct: 1,
+            explanation: "A firewall filters network traffic based on predetermined security rules to block unauthorized access."
+        },
+        {
+            question: "What does NAT stand for?",
+            options: ["Network Access Token", "Network Address Translation", "Network Authentication Tool", "Network Analysis Technique"],
+            correct: 1,
+            explanation: "NAT stands for Network Address Translation, which maps private IP addresses to public IP addresses."
+        },
+        {
+            question: "Which protocol is used for secure web browsing?",
+            options: ["HTTP", "HTTPS", "FTP", "SMTP"],
+            correct: 1,
+            explanation: "HTTPS (HTTP Secure) uses SSL/TLS encryption to provide secure web browsing."
+        },
+        {
+            question: "What is a VLAN?",
+            options: ["Virtual Local Area Network", "Very Large Area Network", "Variable Link Access Network", "Verified Local Access Node"],
+            correct: 0,
+            explanation: "VLAN stands for Virtual Local Area Network, which logically segments a network for security and performance."
+        }
+    ],
+    'wireless-security': [
+        {
+            question: "Which wireless security protocol is most secure?",
+            options: ["WEP", "WPA", "WPA2", "WPA3"],
+            correct: 3,
+            explanation: "WPA3 is the most secure wireless protocol, offering stronger encryption and protection against attacks."
+        },
+        {
+            question: "What is wardriving?",
+            options: ["Driving fast cars", "Searching for wireless networks while mobile", "Racing network packets", "Competitive programming"],
+            correct: 1,
+            explanation: "Wardriving is the practice of searching for wireless networks while moving around in a vehicle or on foot."
+        },
+        {
+            question: "What does WPS stand for?",
+            options: ["Wireless Protection System", "WiFi Protected Setup", "Wireless Password Security", "WiFi Protocol Standard"],
+            correct: 1,
+            explanation: "WPS stands for WiFi Protected Setup, a feature designed to make it easy to add devices to a wireless network."
+        },
+        {
+            question: "Which attack can capture wireless handshakes?",
+            options: ["SQL injection", "Buffer overflow", "Deauthentication attack", "Cross-site scripting"],
+            correct: 2,
+            explanation: "A deauthentication attack can force clients to reconnect, allowing attackers to capture the 4-way handshake."
+        },
+        {
+            question: "What is a rogue access point?",
+            options: ["A broken access point", "An unauthorized access point", "A high-performance access point", "A mobile access point"],
+            correct: 1,
+            explanation: "A rogue access point is an unauthorized wireless access point that can pose security risks to the network."
+        }
+    ],
+    'mobile-security': [
+        {
+            question: "What is APK file format used for?",
+            options: ["iOS applications", "Android applications", "Windows applications", "Web applications"],
+            correct: 1,
+            explanation: "APK (Android Package) files are used to distribute and install Android applications."
+        },
+        {
+            question: "What is jailbreaking in mobile security?",
+            options: ["Breaking out of prison", "Removing iOS restrictions", "Android rooting", "Mobile app development"],
+            correct: 1,
+            explanation: "Jailbreaking refers to removing software restrictions imposed by iOS on Apple devices."
+        },
+        {
+            question: "What is the Android equivalent of jailbreaking?",
+            options: ["Cracking", "Hacking", "Rooting", "Breaking"],
+            correct: 2,
+            explanation: "Rooting is the Android equivalent of jailbreaking, allowing users to gain root access to the Android operating system."
+        },
+        {
+            question: "What is mobile device management (MDM)?",
+            options: ["Managing mobile app development", "Securing and managing mobile devices", "Mobile data mining", "Mobile device manufacturing"],
+            correct: 1,
+            explanation: "MDM is a technology used to secure, monitor, and manage mobile devices deployed across mobile operators, service providers, and enterprises."
+        },
+        {
+            question: "Which tool is commonly used for Android app analysis?",
+            options: ["Wireshark", "Burp Suite", "APKTool", "Nmap"],
+            correct: 2,
+            explanation: "APKTool is commonly used for reverse engineering Android APK files and analyzing mobile applications."
+        }
+    ],
+    'cloud-security': [
+        {
+            question: "What does IAM stand for in cloud security?",
+            options: ["Internet Access Management", "Identity and Access Management", "Internal Application Monitoring", "Integrated Asset Management"],
+            correct: 1,
+            explanation: "IAM stands for Identity and Access Management, controlling who can access cloud resources and what they can do."
+        },
+        {
+            question: "What is the shared responsibility model?",
+            options: ["A pricing model", "A security model dividing responsibilities between cloud provider and customer", "A development methodology", "A compliance framework"],
+            correct: 1,
+            explanation: "The shared responsibility model defines which security responsibilities belong to the cloud provider versus the customer."
+        },
+        {
+            question: "What is an S3 bucket in AWS?",
+            options: ["A computing instance", "A storage container", "A network component", "A database service"],
+            correct: 1,
+            explanation: "An S3 bucket is a container for storing objects (files) in Amazon Web Services Simple Storage Service."
+        },
+        {
+            question: "What is a common misconfiguration in cloud storage?",
+            options: ["Too much encryption", "Public read/write access", "Strong passwords", "Multi-factor authentication"],
+            correct: 1,
+            explanation: "Public read/write access to cloud storage buckets is a common and dangerous misconfiguration that can lead to data breaches."
+        },
+        {
+            question: "What is container security?",
+            options: ["Physical container security", "Securing containerized applications", "Storage container management", "Shipping container tracking"],
+            correct: 1,
+            explanation: "Container security involves securing containerized applications and the container runtime environment."
+        }
+    ],
+    'digital-forensics': [
+        {
+            question: "What is the first rule of digital forensics?",
+            options: ["Work fast", "Preserve the original evidence", "Use the latest tools", "Share findings immediately"],
+            correct: 1,
+            explanation: "The first rule is to preserve the original evidence to maintain its integrity and admissibility in legal proceedings."
+        },
+        {
+            question: "What is a forensic image?",
+            options: ["A picture of evidence", "A bit-by-bit copy of storage media", "A photo of the crime scene", "A diagram of the network"],
+            correct: 1,
+            explanation: "A forensic image is an exact bit-by-bit copy of storage media that preserves all data including deleted files and free space."
+        },
+        {
+            question: "What does chain of custody refer to?",
+            options: ["Parental rights", "Documentation of evidence handling", "Software licenses", "Network topology"],
+            correct: 1,
+            explanation: "Chain of custody is the documentation that tracks the handling and storage of evidence from collection to presentation in court."
+        },
+        {
+            question: "Which hash algorithm is commonly used to verify evidence integrity?",
+            options: ["MD5 only", "SHA-1 only", "Both MD5 and SHA-256", "Base64"],
+            correct: 2,
+            explanation: "Both MD5 and SHA-256 (or other SHA variants) are commonly used to create hash values that verify evidence hasn't been altered."
+        },
+        {
+            question: "What is volatile memory?",
+            options: ["Unstable storage", "Memory that loses data when power is lost", "Corrupted memory", "External storage"],
+            correct: 1,
+            explanation: "Volatile memory (like RAM) loses its contents when power is removed, making it important to collect quickly during investigations."
+        }
+    ],
+    'malware-analysis': [
+        {
+            question: "What is static analysis in malware research?",
+            options: ["Analyzing malware while it's running", "Analyzing malware without executing it", "Analyzing network traffic", "Analyzing system logs"],
+            correct: 1,
+            explanation: "Static analysis involves examining malware without executing it, using tools to analyze code structure, strings, and characteristics."
+        },
+        {
+            question: "What is a sandbox in malware analysis?",
+            options: ["A type of malware", "An isolated environment for safe analysis", "A detection tool", "A prevention method"],
+            correct: 1,
+            explanation: "A sandbox is an isolated, controlled environment where malware can be safely executed and analyzed without risk to the host system."
+        },
+        {
+            question: "What is packing in malware?",
+            options: ["Organizing malware files", "Compressing/encrypting malware to evade detection", "Installing malware", "Distributing malware"],
+            correct: 1,
+            explanation: "Packing involves compressing or encrypting malware to make it harder for antivirus programs to detect and analyze."
+        },
+        {
+            question: "What is a dropper in malware terminology?",
+            options: ["Malware that drops files", "A person who distributes malware", "A detection tool", "A cleanup utility"],
+            correct: 0,
+            explanation: "A dropper is a type of malware designed to install or 'drop' other malicious software onto a target system."
+        },
+        {
+            question: "What does IOC stand for?",
+            options: ["Internet Operations Center", "Indicators of Compromise", "Input/Output Controller", "International Operations Command"],
+            correct: 1,
+            explanation: "IOC stands for Indicators of Compromise - artifacts that suggest a system has been breached or infected with malware."
+        }
+    ],
+    'threat-hunting': [
+        {
+            question: "What is proactive threat hunting?",
+            options: ["Waiting for alerts", "Actively searching for threats", "Responding to incidents", "Installing security tools"],
+            correct: 1,
+            explanation: "Proactive threat hunting involves actively searching for threats and malicious activity rather than waiting for automated alerts."
+        },
+        {
+            question: "What is a hypothesis in threat hunting?",
+            options: ["A scientific theory", "An educated guess about potential threats", "A confirmed threat", "A false positive"],
+            correct: 1,
+            explanation: "A hypothesis in threat hunting is an educated assumption about potential threats or attack techniques that guides the hunting process."
+        },
+        {
+            question: "What framework is commonly used for threat hunting?",
+            options: ["OWASP", "MITRE ATT&CK", "NIST", "ISO 27001"],
+            correct: 1,
+            explanation: "The MITRE ATT&CK framework provides a comprehensive matrix of tactics and techniques used by adversaries, making it valuable for threat hunting."
+        },
+        {
+            question: "What is threat intelligence?",
+            options: ["AI for cybersecurity", "Information about current and potential threats", "Intelligence agencies", "Smart security systems"],
+            correct: 1,
+            explanation: "Threat intelligence is information about current and potential threats that helps organizations understand and prepare for attacks."
+        },
+        {
+            question: "What is the goal of threat hunting?",
+            options: ["To find all vulnerabilities", "To detect advanced threats that bypass security controls", "To replace antivirus software", "To eliminate all risks"],
+            correct: 1,
+            explanation: "The goal of threat hunting is to detect advanced threats and malicious activity that may have bypassed existing security controls."
         }
     ]
 };
 
 function startQuiz(subject) {
-    currentQuiz = quizData[subject] || quizData.reconnaissance;
+    if (!quizData[subject]) {
+        showNotification('Quiz not available for this subject yet!', 'warning');
+        return;
+    }
+    
+    currentQuiz = quizData[subject];
     currentQuizQuestion = 0;
     quizScore = 0;
     
     document.getElementById('quiz-section').style.display = 'block';
     document.getElementById('quiz-total').textContent = currentQuiz.length;
     loadQuizQuestion();
+    
+    // Scroll to quiz section
+    document.getElementById('quiz-section').scrollIntoView({ behavior: 'smooth' });
 }
 
 function loadQuizQuestion() {
@@ -4442,9 +5388,16 @@ function loadQuizQuestion() {
         optionsContainer.appendChild(optionElement);
     });
     
+    // Reset button states
     document.getElementById('quiz-submit').style.display = 'none';
     document.getElementById('quiz-next').style.display = 'none';
     document.getElementById('quiz-complete').style.display = 'none';
+    
+    const restartBtn = document.getElementById('quiz-restart');
+    if (restartBtn) {
+        restartBtn.style.display = 'inline-block';
+    }
+    
     document.getElementById('quiz-feedback').style.display = 'none';
 }
 
@@ -4499,13 +5452,146 @@ function completeQuiz() {
     const percentage = Math.round((quizScore / currentQuiz.length) * 100);
     document.getElementById('quiz-section').style.display = 'none';
     
-    showNotification(`Quiz completed! Score: ${percentage}%`, percentage >= 80 ? 'success' : 'warning');
+    // Enhanced completion message with more details
+    const correctAnswers = quizScore;
+    const totalQuestions = currentQuiz.length;
+    const isFirstAttempt = !quizProgress[currentSubject] || quizProgress[currentSubject].attempts === 0;
     
+    let message = `Quiz completed! Score: ${percentage}% (${correctAnswers}/${totalQuestions})`;
+    
+    if (percentage === 100) {
+        message += " 🎉 Perfect score!";
+    } else if (percentage >= 80) {
+        message += " 🎊 Excellent work!";
+    } else if (percentage >= 60) {
+        message += " 👍 Good effort!";
+    } else {
+        message += " 📚 Keep studying!";
+    }
+    
+    if (isFirstAttempt && percentage >= 80) {
+        message += " Great first attempt!";
+    }
+    
+    showNotification(message, percentage >= 80 ? 'success' : 'warning');
+    
+    // Update quiz progress tracking
+    updateQuizProgress(currentSubject, percentage);
+    
+    // Check for achievements
     if (percentage === 100) {
         unlockAchievement('quiz-master', 'Quiz Master', '🧠');
     }
     
     updateUserProgress('quiz', percentage);
+}
+
+function closeQuiz() {
+    document.getElementById('quiz-section').style.display = 'none';
+    // Reset quiz state
+    currentQuiz = null;
+    currentQuizQuestion = 0;
+    quizScore = 0;
+}
+
+function restartQuiz() {
+    if (currentQuiz) {
+        currentQuizQuestion = 0;
+        quizScore = 0;
+        loadQuizQuestion();
+    }
+}
+
+// Quiz progress tracking
+let quizProgress = JSON.parse(localStorage.getItem('quizProgress')) || {};
+
+function updateQuizProgress(subject, score) {
+    if (!quizProgress[subject]) {
+        quizProgress[subject] = { attempts: 0, bestScore: 0, totalScore: 0 };
+    }
+    
+    quizProgress[subject].attempts++;
+    quizProgress[subject].totalScore += score;
+    quizProgress[subject].bestScore = Math.max(quizProgress[subject].bestScore, score);
+    quizProgress[subject].averageScore = Math.round(quizProgress[subject].totalScore / quizProgress[subject].attempts);
+    
+    localStorage.setItem('quizProgress', JSON.stringify(quizProgress));
+    updateQuizStats();
+    
+    // Check for quiz-related achievements
+    checkQuizAchievements(subject, score);
+}
+
+function checkQuizAchievements(subject, score) {
+    // Perfect score achievement
+    if (score === 100) {
+        const perfectScores = Object.values(quizProgress).filter(p => p.bestScore === 100).length;
+        
+        if (perfectScores === 1) {
+            unlockAchievement('first-perfect', 'Perfect Score', '💯');
+        } else if (perfectScores === 5) {
+            unlockAchievement('quiz-master', 'Quiz Master', '🧠');
+        } else if (perfectScores === 10) {
+            unlockAchievement('quiz-expert', 'Quiz Expert', '🎓');
+        }
+    }
+    
+    // Multiple attempts achievement
+    if (quizProgress[subject].attempts === 5) {
+        unlockAchievement('persistent-learner', 'Persistent Learner', '🔄');
+    }
+    
+    // High average score achievement
+    const subjects = Object.keys(quizProgress);
+    if (subjects.length >= 3) {
+        const averageScore = subjects.reduce((sum, subj) => sum + (quizProgress[subj].totalScore / quizProgress[subj].attempts), 0) / subjects.length;
+        
+        if (averageScore >= 90) {
+            unlockAchievement('high-achiever', 'High Achiever', '⭐');
+        }
+    }
+    
+    // Subject mastery (90+ average score in specific subject)
+    if (quizProgress[subject].averageScore >= 90 && quizProgress[subject].attempts >= 3) {
+        unlockAchievement(`${subject}-quiz-master`, `${subject} Quiz Master`, '🏆');
+    }
+}
+
+function updateQuizStats() {
+    const subjects = Object.keys(quizProgress);
+    if (subjects.length === 0) return;
+    
+    const totalAttempts = subjects.reduce((sum, subject) => sum + quizProgress[subject].attempts, 0);
+    const averageScore = subjects.reduce((sum, subject) => sum + (quizProgress[subject].totalScore / quizProgress[subject].attempts), 0) / subjects.length;
+    
+    const avgScoreElement = document.getElementById('average-quiz-score');
+    if (avgScoreElement) {
+        avgScoreElement.textContent = Math.round(averageScore) + '%';
+    }
+    
+    // Update subject cards with quiz scores
+    updateSubjectQuizScores();
+}
+
+function updateSubjectQuizScores() {
+    document.querySelectorAll('.subject-card').forEach(card => {
+        const subject = card.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+        if (subject && quizProgress[subject]) {
+            let quizScoreElement = card.querySelector('.quiz-score');
+            if (!quizScoreElement) {
+                quizScoreElement = document.createElement('span');
+                quizScoreElement.className = 'quiz-score';
+                const metaElement = card.querySelector('.subject-meta');
+                if (metaElement) {
+                    metaElement.appendChild(quizScoreElement);
+                }
+            }
+            
+            const bestScore = quizProgress[subject].bestScore;
+            quizScoreElement.textContent = `Quiz: ${bestScore}%`;
+            quizScoreElement.className = `quiz-score ${bestScore >= 90 ? 'excellent' : bestScore >= 70 ? 'good' : 'needs-improvement'}`;
+        }
+    });
 }
 
 // Challenge System
@@ -4783,90 +5869,7 @@ function checkVulnerabilities() {
     }, 1500);
 }
 
-// Chat Bot System
-let chatHistory = [];
 
-function toggleChat() {
-    const chatBot = document.getElementById('chat-bot');
-    const chatToggle = document.getElementById('chat-toggle');
-    const notification = document.getElementById('chat-notification');
-    
-    chatBot.classList.toggle('open');
-    
-    if (chatBot.classList.contains('open')) {
-        chatToggle.style.display = 'none';
-        notification.style.display = 'none';
-    } else {
-        chatToggle.style.display = 'flex';
-    }
-}
-
-function sendChatMessage() {
-    const input = document.getElementById('chat-input-field');
-    const message = input.value.trim();
-    
-    if (!message) return;
-    
-    addChatMessage(message, 'user');
-    input.value = '';
-    
-    // Simulate AI response
-    setTimeout(() => {
-        const response = generateAIResponse(message);
-        addChatMessage(response, 'bot');
-    }, 1000);
-}
-
-function addChatMessage(message, sender) {
-    const messagesContainer = document.getElementById('chat-messages');
-    const messageElement = document.createElement('div');
-    messageElement.className = `message ${sender}`;
-    
-    const now = new Date();
-    const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
-    messageElement.innerHTML = `
-        <div class="message-content">
-            <p>${message}</p>
-        </div>
-        <div class="message-time">${timeString}</div>
-    `;
-    
-    messagesContainer.appendChild(messageElement);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    
-    chatHistory.push({ message, sender, timestamp: now });
-}
-
-function generateAIResponse(userMessage) {
-    const responses = {
-        'sql injection': 'SQL injection is a code injection technique that exploits vulnerabilities in applications that use SQL databases. Always use parameterized queries to prevent it!',
-        'pentesting': 'Penetration testing involves simulating cyber attacks to identify security vulnerabilities. Start with reconnaissance, then vulnerability assessment, and finally exploitation (with permission!).',
-        'tools': 'Popular ethical hacking tools include Nmap (network scanning), Burp Suite (web app testing), Metasploit (exploitation), and Wireshark (network analysis).',
-        'default': "I'm here to help with ethical hacking concepts! Feel free to ask about specific topics like SQL injection, penetration testing, or security tools."
-    };
-    
-    const lowercaseMessage = userMessage.toLowerCase();
-    
-    for (const [keyword, response] of Object.entries(responses)) {
-        if (lowercaseMessage.includes(keyword)) {
-            return response;
-        }
-    }
-    
-    return responses.default;
-}
-
-function askPresetQuestion(question) {
-    document.getElementById('chat-input-field').value = question;
-    sendChatMessage();
-}
-
-function handleChatKeyPress(event) {
-    if (event.key === 'Enter') {
-        sendChatMessage();
-    }
-}
 
 // Theme Toggle
 function toggleTheme() {
@@ -5279,19 +6282,10 @@ function showShortcutsHelp() {
     document.body.appendChild(helpModal);
 }
 
-function openChat() {
-    const chatBot = document.getElementById('chat-bot');
-    if (!chatBot.classList.contains('open')) {
-        toggleChat();
-    }
-    document.getElementById('chat-input-field').focus();
-}
+
 
 function handleEscape() {
     closeAllModals();
-    if (document.getElementById('chat-bot').classList.contains('open')) {
-        toggleChat();
-    }
     if (document.getElementById('user-dropdown').style.display === 'block') {
         toggleUserProfile();
     }
@@ -5361,9 +6355,22 @@ function initNavigation() {
             
             // Get the target section
             const targetId = this.getAttribute('href').substring(1); // Remove the #
+            
+            // Handle AI chat section specially
+            if (targetId === 'ai-chat') {
+                showAIChat();
+                return;
+            }
+            
             const targetSection = document.getElementById(targetId);
             
             if (targetSection) {
+                // Hide AI chat section if showing
+                const aiChatSection = document.getElementById('ai-chat');
+                if (aiChatSection) {
+                    aiChatSection.style.display = 'none';
+                }
+                
                 // Smooth scroll to section
                 targetSection.scrollIntoView({
                     behavior: 'smooth',
@@ -5381,7 +6388,7 @@ function initNavigation() {
 }
 
 function updateActiveNavOnScroll() {
-    const sections = ['home', 'tools', 'subjects', 'achievements', 'about'];
+    const sections = ['home', 'tools', 'subjects', 'achievements', 'ai-chat', 'about'];
     const navLinks = document.querySelectorAll('.nav-link');
     
     let currentSection = 'home';
@@ -5399,6 +6406,17 @@ function updateActiveNavOnScroll() {
     navLinks.forEach(link => {
         link.classList.remove('active');
         if (link.getAttribute('href') === `#${currentSection}`) {
+            link.classList.add('active');
+        }
+    });
+}
+
+// Update navigation active state
+function updateNavigation(activeSection) {
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${activeSection}`) {
             link.classList.add('active');
         }
     });
@@ -5731,6 +6749,24 @@ document.addEventListener('DOMContentLoaded', function() {
     initPerformanceMonitoring();
     createOptimizedSearch();
     
+    // Initialize quiz event listeners
+    const quizSubmitBtn = document.getElementById('quiz-submit');
+    const quizNextBtn = document.getElementById('quiz-next');
+    const quizCompleteBtn = document.getElementById('quiz-complete');
+    
+    if (quizSubmitBtn) quizSubmitBtn.addEventListener('click', submitQuizAnswer);
+    if (quizNextBtn) quizNextBtn.addEventListener('click', nextQuizQuestion);
+    if (quizCompleteBtn) quizCompleteBtn.addEventListener('click', completeQuiz);
+    
+    // Load saved quiz progress
+    updateQuizStats();
+    
+    // Initialize audio system
+    setTimeout(() => {
+        initializeAudio();
+        addUniversalClickSounds();
+    }, 500);
+    
     // Lazy load heavy features
     setTimeout(() => {
         loadUserProgress();
@@ -5763,6 +6799,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
             case 'Escape':
                 closeAllModals();
+                closeQuiz(); // Also close quiz on escape
                 break;
         }
     });
@@ -5889,3 +6926,1167 @@ function updateAchievementProgress() {
         if (progressText) progressText.textContent = `${progress}/1`;
     }
 }
+
+/* =================== FREE AI ASSISTANT SYSTEM =================== */
+
+// AI Knowledge Base - Comprehensive ethical hacking information
+const aiKnowledgeBase = {
+    // Core Concepts
+    'sql injection': {
+        answer: `🔍 **SQL Injection** is a code injection technique that exploits security vulnerabilities in an application's software by inserting malicious SQL statements into input fields.
+
+**How it works:**
+• Attackers input malicious SQL code into web forms
+• The application executes this code against the database
+• Can lead to data theft, modification, or deletion
+
+**Prevention:**
+✅ Use parameterized queries/prepared statements
+✅ Input validation and sanitization
+✅ Principle of least privilege for database accounts
+✅ Web Application Firewalls (WAFs)
+
+**Example vulnerable code:**
+\`SELECT * FROM users WHERE id = '${userInput}'\`
+
+**Safe code:**
+\`SELECT * FROM users WHERE id = ?\` (with parameterized query)`,
+        related: ['xss', 'web security', 'owasp', 'input validation']
+    },
+    
+    'xss': {
+        answer: `⚠️ **Cross-Site Scripting (XSS)** allows attackers to inject malicious scripts into websites viewed by other users.
+
+**Types of XSS:**
+🎯 **Stored XSS:** Malicious script stored on server
+🎯 **Reflected XSS:** Script reflected off web server
+🎯 **DOM-based XSS:** Client-side script modification
+
+**Impact:**
+• Session hijacking
+• Credential theft
+• Defacement
+• Phishing attacks
+
+**Prevention:**
+✅ Output encoding/escaping
+✅ Content Security Policy (CSP)
+✅ Input validation
+✅ Use security headers
+✅ Regular security testing`,
+        related: ['sql injection', 'web security', 'csrf', 'owasp']
+    },
+
+    'reconnaissance': {
+        answer: `🔍 **Reconnaissance** is the information gathering phase - the foundation of ethical hacking.
+
+**Types:**
+📊 **Passive Recon:** Gathering info without direct interaction
+• Google dorking, social media research
+• WHOIS lookups, DNS enumeration
+• Public records and OSINT
+
+🎯 **Active Recon:** Direct interaction with target
+• Port scanning with Nmap
+• Banner grabbing
+• Vulnerability scanning
+
+**Popular Tools:**
+🛠️ Nmap - Network scanning
+🛠️ Maltego - OSINT analysis  
+🛠️ theHarvester - Email/domain gathering
+🛠️ Shodan - Internet device search
+🛠️ Google Dorks - Advanced search techniques
+
+**Remember:** Always get proper authorization before testing!`,
+        related: ['nmap', 'osint', 'scanning', 'enumeration']
+    },
+
+    'nmap': {
+        answer: `🗺️ **Nmap** (Network Mapper) is the most popular network discovery and security auditing tool.
+
+**Common Scans:**
+\`nmap -sS target\` - TCP SYN scan (stealthy)
+\`nmap -sU target\` - UDP scan
+\`nmap -sV target\` - Version detection
+\`nmap -O target\` - OS detection
+\`nmap -A target\` - Aggressive scan (OS, version, scripts)
+
+**Useful Options:**
+• \`-p-\` - Scan all ports
+• \`-T4\` - Faster timing template
+• \`--script\` - Use NSE scripts
+• \`-oA filename\` - Output in all formats
+
+**Stealth Tips:**
+🥷 Use decoy scans: \`-D RND:10\`
+🥷 Fragment packets: \`-f\`
+🥷 Slower timing: \`-T1\`
+
+**Popular NSE Scripts:**
+• \`vuln\` - Vulnerability detection
+• \`http-enum\` - Web enumeration
+• \`smb-enum-shares\` - SMB share enumeration`,
+        related: ['reconnaissance', 'scanning', 'enumeration', 'pentesting']
+    },
+
+    'metasploit': {
+        answer: `🚀 **Metasploit** is the world's most popular penetration testing framework.
+
+**Core Components:**
+🎯 **Exploits:** Code that takes advantage of vulnerabilities
+🎯 **Payloads:** Code that runs after successful exploitation
+🎯 **Auxiliaries:** Scanning and fuzzing modules
+🎯 **Encoders:** Evade antivirus detection
+
+**Basic Commands:**
+\`msfconsole\` - Start Metasploit
+\`search\` - Find exploits/modules
+\`use exploit/path\` - Select exploit
+\`set RHOSTS target\` - Set target IP
+\`exploit\` - Launch attack
+
+**Popular Exploits:**
+• \`exploit/windows/smb/ms17_010_eternalblue\`
+• \`exploit/multi/handler\` - Generic payload handler
+• \`exploit/linux/http/apache_struts_rce\`
+
+**Payload Examples:**
+• \`windows/meterpreter/reverse_tcp\`
+• \`linux/x86/shell_reverse_tcp\`
+• \`php/meterpreter_reverse_tcp\`
+
+⚠️ **Ethics:** Only use on systems you own or have explicit permission to test!`,
+        related: ['pentesting', 'exploitation', 'meterpreter', 'payload']
+    },
+
+    'burp suite': {
+        answer: `🕷️ **Burp Suite** is the leading web application security testing platform.
+
+**Key Features:**
+🎯 **Proxy:** Intercept and modify HTTP/S traffic
+🎯 **Scanner:** Automated vulnerability detection
+🎯 **Repeater:** Manual request testing
+🎯 **Intruder:** Automated attack tool
+🎯 **Sequencer:** Token randomness analysis
+
+**Common Workflow:**
+1. Configure browser proxy (127.0.0.1:8080)
+2. Browse target application
+3. Review HTTP history
+4. Send requests to Repeater for manual testing
+5. Use Scanner for automated testing
+
+**Professional vs Community:**
+✅ **Community (Free):** Proxy, Repeater, Decoder
+💰 **Professional:** Scanner, Intruder, Extensions
+
+**Best Practices:**
+• Always test in scope only
+• Use SSL pass-through for performance
+• Leverage extensions from BApp Store
+• Document findings thoroughly`,
+        related: ['web security', 'http', 'owasp', 'proxy']
+    },
+
+    'wireshark': {
+        answer: `📡 **Wireshark** is the world's most popular network protocol analyzer.
+
+**Core Features:**
+🔍 **Deep Packet Inspection:** Analyze hundreds of protocols
+🔍 **Live Capture:** Real-time network monitoring
+🔍 **Offline Analysis:** Examine saved capture files
+🔍 **Filtering:** Focus on specific traffic
+
+**Common Filters:**
+• \`http\` - HTTP traffic only
+• \`tcp.port == 80\` - Port 80 traffic
+• \`ip.addr == 192.168.1.1\` - Specific IP
+• \`dns\` - DNS queries/responses
+• \`tcp.flags.syn == 1\` - SYN packets
+
+**Use Cases:**
+🛠️ Network troubleshooting
+🛠️ Security analysis
+🛠️ Malware analysis
+🛠️ Protocol development
+🛠️ Forensic investigation
+
+**Pro Tips:**
+• Use capture filters to reduce file size
+• Follow TCP streams for full conversations
+• Export objects from HTTP traffic
+• Use statistics for traffic overview`,
+        related: ['network security', 'packet analysis', 'forensics', 'monitoring']
+    },
+
+    'kali linux': {
+        answer: `🐉 **Kali Linux** is the premier penetration testing and security auditing distribution.
+
+**Pre-installed Tools (500+):**
+🛠️ **Reconnaissance:** Nmap, Maltego, theHarvester
+🛠️ **Web Apps:** Burp Suite, OWASP ZAP, SQLmap
+🛠️ **Exploitation:** Metasploit, Social Engineer Toolkit
+🛠️ **Wireless:** Aircrack-ng, Reaver, Wifite
+🛠️ **Forensics:** Autopsy, Volatility, Sleuth Kit
+
+**Installation Options:**
+💻 Native installation
+🖥️ Virtual machine (VMware/VirtualBox)
+☁️ Cloud instances (AWS/Azure)
+📱 Kali NetHunter (Android)
+
+**Essential Commands:**
+\`apt update && apt upgrade\` - Update system
+\`searchsploit\` - Search exploits
+\`updatedb\` - Update locate database
+\`service postgresql start\` - Start Metasploit DB
+
+**Best Practices:**
+• Don't use as daily driver OS
+• Always update before assessments
+• Use VM snapshots for clean states
+• Practice in isolated lab environments`,
+        related: ['linux', 'pentesting', 'tools', 'distribution']
+    },
+
+    'pentesting': {
+        answer: `🎯 **Penetration Testing** is authorized simulation of cyberattacks to evaluate security.
+
+**Methodology (5 Phases):**
+1️⃣ **Reconnaissance:** Information gathering
+2️⃣ **Scanning:** Identifying live systems and services
+3️⃣ **Enumeration:** Extracting detailed information
+4️⃣ **Exploitation:** Gaining unauthorized access
+5️⃣ **Post-Exploitation:** Maintaining access, data collection
+
+**Types of Pen Tests:**
+🔲 **Black Box:** No prior knowledge
+🔳 **White Box:** Full knowledge provided
+🔲 **Gray Box:** Limited knowledge
+
+**Popular Frameworks:**
+• **OWASP Testing Guide**
+• **NIST SP 800-115**
+• **OSSTMM**
+• **PTES (Penetration Testing Execution Standard)**
+
+**Career Path:**
+📈 Junior Penetration Tester
+📈 Senior Penetration Tester
+📈 Lead Security Consultant
+📈 Red Team Leader
+
+**Certifications:**
+🏆 CEH, OSCP, CISSP, GPEN`,
+        related: ['methodology', 'frameworks', 'career', 'certification']
+    },
+
+    'cryptography': {
+        answer: `🔐 **Cryptography** is the practice of securing information through mathematical techniques.
+
+**Core Concepts:**
+🔑 **Symmetric Encryption:** Same key for encrypt/decrypt (AES, DES)
+🔑 **Asymmetric Encryption:** Public/private key pairs (RSA, ECC)
+🔑 **Hashing:** One-way functions (SHA-256, MD5)
+🔑 **Digital Signatures:** Verify authenticity and integrity
+
+**Common Algorithms:**
+✅ **AES-256:** Current standard for symmetric encryption
+✅ **RSA-2048:** Popular for asymmetric encryption
+✅ **SHA-256:** Secure hashing algorithm
+✅ **ECDSA:** Elliptic curve digital signatures
+
+**Attacks & Weaknesses:**
+⚠️ **Brute Force:** Try all possible keys
+⚠️ **Dictionary Attacks:** Common passwords
+⚠️ **Rainbow Tables:** Pre-computed hash lookups
+⚠️ **Side-Channel:** Timing/power analysis
+
+**Best Practices:**
+• Use strong, random keys
+• Implement proper key management
+• Never create your own crypto
+• Use proven, tested algorithms`,
+        related: ['encryption', 'hashing', 'keys', 'algorithms']
+    }
+};
+
+// AI Response Generator
+function generateFreeAIResponse(userMessage) {
+    const message = userMessage.toLowerCase().trim();
+    
+    // Direct knowledge base lookup
+    for (const [topic, data] of Object.entries(aiKnowledgeBase)) {
+        if (message.includes(topic)) {
+            return {
+                response: data.answer,
+                confidence: 'high',
+                suggestions: data.related
+            };
+        }
+    }
+    
+    // Pattern matching for common questions
+    const patterns = [
+        {
+            pattern: /what is|explain|define/i,
+            response: `I'd be happy to explain! I have detailed knowledge about:
+
+🔍 **Security Concepts:** SQL injection, XSS, CSRF, authentication
+🛠️ **Tools:** Nmap, Metasploit, Burp Suite, Wireshark, Kali Linux
+🎯 **Methodologies:** Penetration testing, reconnaissance, enumeration
+🔐 **Cryptography:** Encryption, hashing, digital signatures
+🌐 **Web Security:** OWASP Top 10, secure coding practices
+
+Try asking about any specific topic, like "What is SQL injection?" or "Explain penetration testing methodology"`
+        },
+        {
+            pattern: /how to start|beginner|getting started/i,
+            response: `🚀 **Getting Started in Ethical Hacking:**
+
+**1. Foundation Knowledge:**
+• Learn networking fundamentals (TCP/IP, protocols)
+• Understand operating systems (Linux, Windows)
+• Basic programming/scripting (Python, Bash)
+
+**2. Essential Tools:**
+• Start with Kali Linux in a VM
+• Practice with Nmap for scanning
+• Learn Burp Suite for web testing
+• Get familiar with Metasploit
+
+**3. Practice Platforms:**
+• TryHackMe (beginner-friendly)
+• HackTheBox (intermediate/advanced)
+• VulnHub (downloadable VMs)
+• DVWA (Damn Vulnerable Web App)
+
+**4. Study Path:**
+📚 CompTIA Security+ → CEH → OSCP
+
+Remember: Always practice ethically and only on systems you own or have permission to test!`
+        },
+        {
+            pattern: /tools|software|programs/i,
+            response: `🛠️ **Essential Ethical Hacking Tools:**
+
+**Reconnaissance:**
+• Nmap - Network scanning
+• Maltego - OSINT analysis
+• theHarvester - Email/domain gathering
+
+**Web Application Testing:**
+• Burp Suite - Web proxy and scanner
+• OWASP ZAP - Free web scanner
+• SQLmap - SQL injection testing
+
+**Exploitation:**
+• Metasploit - Exploitation framework
+• Social Engineer Toolkit - Social engineering
+• BeEF - Browser exploitation
+
+**Network Analysis:**
+• Wireshark - Packet analyzer
+• Aircrack-ng - Wireless security
+• John the Ripper - Password cracking
+
+**Operating Systems:**
+• Kali Linux - Penetration testing distro
+• Parrot Security - Alternative pentesting OS
+
+Which specific tool would you like to learn more about?`
+        },
+        {
+            pattern: /certification|cert|exam/i,
+            response: `🏆 **Popular Ethical Hacking Certifications:**
+
+**Beginner Level:**
+• **CompTIA Security+** - Foundation security knowledge
+• **CEH (Certified Ethical Hacker)** - Entry-level ethical hacking
+
+**Intermediate Level:**
+• **GCIH** - SANS incident handling
+• **GPEN** - SANS penetration testing
+• **eJPT** - eLearnSecurity junior pentester
+
+**Advanced Level:**
+• **OSCP** - Offensive Security Certified Professional
+• **CISSP** - Advanced security management
+• **CISM** - Information security management
+
+**Specialized:**
+• **CWSP** - Wireless security
+• **GCFA** - Digital forensics
+• **GREM** - Reverse engineering
+
+**Study Tips:**
+• Start with Security+ for foundation
+• Practice hands-on in labs
+• Join study groups and forums
+• Take practice exams regularly`
+        },
+        {
+            pattern: /legal|ethics|law/i,
+            response: `⚖️ **Legal and Ethical Considerations:**
+
+**Golden Rules:**
+🚫 **NEVER** test systems you don't own
+✅ **ALWAYS** get written permission
+✅ **RESPECT** scope and boundaries
+✅ **PROTECT** client data and privacy
+
+**Legal Framework:**
+• **Authorized Testing:** Signed contracts/agreements
+• **Bug Bounty Programs:** Follow program rules
+• **Research:** Use isolated lab environments
+• **Disclosure:** Responsible vulnerability reporting
+
+**Common Laws:**
+• Computer Fraud and Abuse Act (USA)
+• Computer Misuse Act (UK)
+• Cybercrime laws vary by country
+
+**Best Practices:**
+• Document all activities
+• Use VPNs and protect your identity
+• Have liability insurance
+• Join professional organizations (EC-Council, (ISC)²)
+
+**Remember:** "Just because you can, doesn't mean you should."
+Ethical hacking is about making systems more secure, not causing harm!`
+        }
+    ];
+    
+    for (const pattern of patterns) {
+        if (pattern.pattern.test(message)) {
+            return {
+                response: pattern.response,
+                confidence: 'medium',
+                suggestions: ['pentesting', 'tools', 'certification', 'legal']
+            };
+        }
+    }
+    
+    // Fallback response
+    return {
+        response: `🤔 I'm not sure about that specific topic, but I can help you with:
+
+🔍 **Security Concepts:** SQL injection, XSS, cryptography, authentication
+🛠️ **Tools & Techniques:** Nmap, Metasploit, Burp Suite, Wireshark
+📚 **Learning Resources:** Study guides, certifications, practice platforms
+⚖️ **Ethics & Legal:** Responsible disclosure, authorized testing
+
+Try asking about a specific topic like "What is SQL injection?" or "How to start pentesting?"
+
+You can also check out our interactive tutorials for hands-on learning!`,
+        confidence: 'low',
+        suggestions: ['sql injection', 'pentesting', 'tools', 'getting started']
+    };
+}
+
+// Bytrox Chat Functions
+function toggleAIAssistant() {
+    const panel = document.getElementById('ai-assistant-panel');
+    if (panel.style.display === 'none' || !panel.style.display) {
+        panel.style.display = 'flex';
+        document.getElementById('bx-input').focus();
+        trackUserActivity('ai_assistant_opened');
+    } else {
+        panel.style.display = 'none';
+        trackUserActivity('ai_assistant_closed');
+    }
+}
+
+function sendBytroxMessage() {
+    const input = document.querySelector('.bx-input');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    // Add user message
+    addBytroxMessage(message, 'user');
+    input.value = '';
+    
+    // Show typing indicator
+    showBytroxTyping();
+    
+    // Generate AI response (simulate thinking time)
+    setTimeout(() => {
+        hideBytroxTyping();
+        const aiResponse = generateFreeAIResponse(message);
+        addBytroxMessage(aiResponse.response, 'bot');
+        
+        trackUserActivity('ai_message_sent', { message: message, confidence: aiResponse.confidence });
+    }, 800 + Math.random() * 1200); // Random delay for realism
+}
+
+function addBytroxMessage(message, sender) {
+    const container = document.querySelector('.bx-messages');
+    const messageElement = document.createElement('li');
+    messageElement.className = `bx-msg ${sender}`;
+    
+    const avatarElement = document.createElement('div');
+    avatarElement.className = 'bx-avatar';
+    avatarElement.textContent = sender === 'bot' ? '🤖' : '👤';
+    
+    const bubbleElement = document.createElement('div');
+    bubbleElement.className = 'bx-bubble';
+    
+    const textElement = document.createElement('p');
+    if (sender === 'bot') {
+        textElement.innerHTML = formatAIMessage(message);
+    } else {
+        textElement.textContent = message;
+    }
+    
+    const metaElement = document.createElement('span');
+    metaElement.className = 'bx-meta';
+    metaElement.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    bubbleElement.appendChild(textElement);
+    bubbleElement.appendChild(metaElement);
+    messageElement.appendChild(avatarElement);
+    messageElement.appendChild(bubbleElement);
+    
+    container.appendChild(messageElement);
+    
+    // Scroll to bottom
+    const chatMain = document.querySelector('.bx-chat-main');
+    chatMain.scrollTop = chatMain.scrollHeight;
+}
+
+function formatAIMessage(message) {
+    return message
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+        .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
+        .replace(/`(.*?)`/g, '<code>$1</code>') // Code
+        .replace(/^### (.*$)/gm, '<h4>$1</h4>') // Headers
+        .replace(/^• (.*$)/gm, '<li>$1</li>') // List items
+        .replace(/^✅ (.*$)/gm, '<li class="success">✅ $1</li>') // Success items
+        .replace(/^⚠️ (.*$)/gm, '<li class="warning">⚠️ $1</li>') // Warning items
+        .replace(/^🛠️ (.*$)/gm, '<li class="tool">🛠️ $1</li>') // Tool items
+        .replace(/\n\n/g, '</p><p>') // Paragraphs
+        .replace(/^(?!<)/gm, '<p>') // Start paragraphs
+        .replace(/(?<!>)$/gm, '</p>') // End paragraphs
+        .replace(/<p><\/p>/g, '') // Remove empty paragraphs
+        .replace(/<p>(<h4>.*?<\/h4>)<\/p>/g, '$1'); // Fix headers in paragraphs
+}
+
+function showBytroxTyping() {
+    const container = document.querySelector('.bx-messages');
+    const typingElement = document.createElement('li');
+    typingElement.className = 'bx-msg bot';
+    typingElement.id = 'bx-typing-indicator';
+    
+    const avatarElement = document.createElement('div');
+    avatarElement.className = 'bx-avatar';
+    avatarElement.textContent = '🤖';
+    
+    const bubbleElement = document.createElement('div');
+    bubbleElement.className = 'bx-bubble';
+    
+    const dotsElement = document.createElement('div');
+    dotsElement.className = 'bx-typing-indicator';
+    dotsElement.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+    
+    bubbleElement.appendChild(dotsElement);
+    typingElement.appendChild(avatarElement);
+    typingElement.appendChild(bubbleElement);
+    
+    container.appendChild(typingElement);
+    
+    // Scroll to bottom
+    const chatMain = document.querySelector('.bx-chat-main');
+    chatMain.scrollTop = chatMain.scrollHeight;
+}
+
+function hideBytroxTyping() {
+    const typingElement = document.getElementById('bx-typing-indicator');
+    if (typingElement) {
+        typingElement.remove();
+    }
+}
+
+function handleBytroxKeyPress(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendBytroxMessage();
+    }
+}
+
+function clearBytroxChat() {
+    const container = document.querySelector('.bx-messages');
+    container.innerHTML = '';
+    showNotification('Chat history cleared', 'success');
+}
+
+// AI Tab Functions
+function askAIFromTab(question) {
+    document.getElementById('ai-input-field-tab').value = question;
+    sendAIMessageTab();
+}
+
+function sendAIMessageTab() {
+    const input = document.getElementById('ai-input-field-tab');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    // Disable input and send button during processing
+    input.disabled = true;
+    const sendBtn = document.querySelector('.ai-send-btn-modern');
+    sendBtn.disabled = true;
+    sendBtn.style.opacity = '0.6';
+    
+    // Add user message
+    addAIMessageTab(message, 'user');
+    input.value = '';
+    autoResizeTextarea(input);
+    
+    // Show typing indicator
+    showAITypingTab();
+    
+    // Generate AI response (simulate thinking time)
+    setTimeout(() => {
+        hideAITypingTab();
+        const aiResponse = generateFreeAIResponse(message);
+        addAIMessageTab(aiResponse.response, 'bot');
+        
+        // Add suggestions if available
+        if (aiResponse.suggestions && aiResponse.suggestions.length > 0) {
+            setTimeout(() => {
+                addAISuggestionsTab(aiResponse.suggestions);
+            }, 300);
+        }
+        
+        // Re-enable input and send button
+        input.disabled = false;
+        sendBtn.disabled = false;
+        sendBtn.style.opacity = '1';
+        input.focus();
+        
+        trackUserActivity('ai_message_sent_tab', { message: message, confidence: aiResponse.confidence });
+    }, 800 + Math.random() * 1200); // Random delay for realism
+}
+
+function addAIMessageTab(message, sender) {
+    const container = document.getElementById('ai-chat-container-tab');
+    const messageElement = document.createElement('div');
+    messageElement.className = `ai-message-modern ai-${sender}-message`;
+    
+    if (sender === 'user') {
+        messageElement.innerHTML = `
+            <div class="ai-message-avatar-modern">👤</div>
+            <div class="ai-message-content-modern">
+                <div class="ai-message-text">${escapeHtml(message)}</div>
+                <div class="ai-message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+            </div>
+        `;
+    } else {
+        messageElement.innerHTML = `
+            <div class="ai-message-avatar-modern">🤖</div>
+            <div class="ai-message-content-modern">
+                <div class="ai-message-text">${formatAIMessage(message)}</div>
+                <div class="ai-message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+            </div>
+        `;
+    }
+    
+    container.appendChild(messageElement);
+    container.scrollTop = container.scrollHeight;
+    
+    // Add smooth scroll animation
+    requestAnimationFrame(() => {
+        messageElement.style.opacity = '0';
+        messageElement.style.transform = 'translateY(20px)';
+        messageElement.style.transition = 'all 0.3s ease';
+        
+        requestAnimationFrame(() => {
+            messageElement.style.opacity = '1';
+            messageElement.style.transform = 'translateY(0)';
+        });
+    });
+}
+
+function showAITypingTab() {
+    const container = document.getElementById('ai-chat-container-tab');
+    const typingElement = document.createElement('div');
+    typingElement.className = 'ai-typing-indicator-modern';
+    typingElement.id = 'ai-typing-indicator-tab';
+    
+    typingElement.innerHTML = `
+        <div class="ai-message-avatar-modern">🤖</div>
+        <div class="ai-message-content-modern">
+            <div class="ai-typing-content">
+                <div class="typing-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(typingElement);
+    container.scrollTop = container.scrollHeight;
+}
+
+function hideAITypingTab() {
+    const typingElement = document.getElementById('ai-typing-indicator-tab');
+    if (typingElement) {
+        typingElement.style.opacity = '0';
+        typingElement.style.transform = 'translateY(-10px)';
+        setTimeout(() => {
+            if (typingElement.parentNode) {
+                typingElement.remove();
+            }
+        }, 200);
+    }
+}
+
+function addAISuggestionsTab(suggestions) {
+    const container = document.getElementById('ai-chat-container-tab');
+    const suggestionsElement = document.createElement('div');
+    suggestionsElement.className = 'ai-message-modern ai-bot-message';
+    
+    suggestionsElement.innerHTML = `
+        <div class="ai-message-avatar-modern">🤖</div>
+        <div class="ai-message-content-modern">
+            <div class="ai-suggestions-inline">
+                <div class="ai-suggestions-title">💡 Related topics you might find interesting:</div>
+                <div class="ai-suggestions-buttons">
+                    ${suggestions.slice(0, 3).map(suggestion => 
+                        `<button class="ai-suggestion-inline" onclick="askAIFromTab('${suggestion}')">${suggestion}</button>`
+                    ).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(suggestionsElement);
+    container.scrollTop = container.scrollHeight;
+}
+
+function handleAIKeyPressTab(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendAIMessageTab();
+    }
+}
+
+function clearAIChatTab() {
+    const container = document.getElementById('ai-chat-container-tab');
+    // Keep only the welcome message
+    const welcomeMessage = container.querySelector('.ai-welcome-message-modern');
+    container.innerHTML = '';
+    if (welcomeMessage) {
+        container.appendChild(welcomeMessage);
+    }
+    showNotification('AI chat history cleared', 'success');
+}
+
+function exportAIChat() {
+    const container = document.getElementById('ai-chat-container-tab');
+    const messages = container.querySelectorAll('.ai-message-modern:not(.ai-typing-indicator-modern)');
+    
+    let chatLog = '# Bytrox AI Assistant Chat Export\n\n';
+    chatLog += `Export Date: ${new Date().toLocaleString()}\n\n`;
+    
+    messages.forEach(message => {
+        const sender = message.classList.contains('ai-user-message') ? 'You' : 'AI Assistant';
+        const contentElement = message.querySelector('.ai-message-text');
+        if (contentElement) {
+            const content = contentElement.textContent;
+            const timeElement = message.querySelector('.ai-message-time');
+            const time = timeElement ? timeElement.textContent : '';
+            
+            chatLog += `**${sender}** (${time})\n${content}\n\n`;
+        }
+    });
+    
+    // Create download link
+    const blob = new Blob([chatLog], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bytrox-ai-chat-${new Date().getTime()}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    showNotification('Chat exported successfully', 'success');
+}
+
+// Auto-resize textarea as user types
+function autoResizeTextarea(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+}
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Add event listener for textarea auto-resize
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('ai-input-field-tab');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            autoResizeTextarea(this);
+        });
+    }
+});
+
+/* ================= BYTROX AI CHAT SYSTEM ================== */
+
+// AI Chat Configuration - Global scope
+window.AI_CONFIG = {
+    apiKey: 'AIzaSyDud0VbsC-0C9CjVt5F3vpJugbhKD5wYQQ',
+    apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
+};
+
+// AI Chat State - Initialize immediately
+window.isAITyping = false;
+window.chatHistory = [];
+
+// Initialize AI Chat
+function initializeAIChat() {
+    console.log('Initializing AI Chat'); // Debug log
+    const userInput = document.getElementById('user-input');
+    if (userInput) {
+        console.log('User input found, adding keypress listener');
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                console.log('Enter key pressed, calling sendMessage');
+                sendMessage();
+            }
+        });
+    } else {
+        console.log('User input element not found');
+    }
+}
+
+// Send message function - Define globally
+async function sendMessage() {
+    console.log('sendMessage called'); // Debug log
+    const userInput = document.getElementById('user-input');
+    const sendButton = document.getElementById('send-button');
+    
+    if (!userInput) {
+        console.error('user-input element not found');
+        return;
+    }
+    if (!sendButton) {
+        console.error('send-button element not found');
+        return;
+    }
+    
+    const message = userInput.value.trim();
+    console.log('Message:', message); // Debug log
+    
+    if (!message || window.isAITyping) {
+        console.log('No message or AI is typing');
+        return;
+    }
+    
+    // Add user message to chat
+    addMessageToChat(message, 'user');
+    userInput.value = '';
+    
+    // Disable input while AI is responding
+    sendButton.disabled = true;
+    sendButton.innerHTML = '<span class="send-icon">⏳</span>';
+    userInput.disabled = true;
+    window.isAITyping = true;
+    
+    // Show typing indicator
+    showTypingIndicator();
+    
+    try {
+        // Get AI response
+        const response = await getAIResponse(message);
+        
+        // Remove typing indicator and add AI response
+        removeTypingIndicator();
+        addMessageToChat(response, 'ai');
+        
+    } catch (error) {
+        console.error('AI Error:', error);
+        removeTypingIndicator();
+        addMessageToChat('Sorry, I encountered an error. Please try again later.', 'ai');
+    } finally {
+        // Re-enable input
+        sendButton.disabled = false;
+        sendButton.innerHTML = '<span class="send-icon">➤</span>';
+        userInput.disabled = false;
+        window.isAITyping = false;
+    }
+}
+
+// Add message to chat display
+function addMessageToChat(message, sender) {
+    const chatMessages = document.getElementById('chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}-message`;
+    
+    const avatar = sender === 'user' ? '👤' : '🤖';
+    const messageHTML = `
+        <div class="message-avatar">${avatar}</div>
+        <div class="message-content">
+            <p>${formatMessage(message)}</p>
+        </div>
+    `;
+    
+    messageDiv.innerHTML = messageHTML;
+    chatMessages.appendChild(messageDiv);
+    
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // Store in chat history
+    if (!window.chatHistory) window.chatHistory = [];
+    window.chatHistory.push({ message, sender, timestamp: new Date() });
+    
+    // Play sound effect
+    playClickSound();
+}
+
+// Format message with basic markdown support
+function formatMessage(text) {
+    // Escape HTML first
+    text = escapeHtml(text);
+    
+    // Convert **bold** to <strong>
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Convert *italic* to <em>
+    text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Convert `code` to <code>
+    text = text.replace(/`(.*?)`/g, '<code>$1</code>');
+    
+    // Convert line breaks
+    text = text.replace(/\n/g, '<br>');
+    
+    return text;
+}
+
+// Show typing indicator
+function showTypingIndicator() {
+    const chatMessages = document.getElementById('chat-messages');
+    const typingDiv = document.createElement('div');
+    typingDiv.id = 'typing-indicator';
+    typingDiv.className = 'message ai-message';
+    typingDiv.innerHTML = `
+        <div class="message-avatar">🤖</div>
+        <div class="message-content">
+            <div class="typing-indicator">
+                <span>Bytrox AI is typing</span>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    chatMessages.appendChild(typingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Remove typing indicator
+function removeTypingIndicator() {
+    const typingIndicator = document.getElementById('typing-indicator');
+    if (typingIndicator) {
+        typingIndicator.remove();
+    }
+}
+
+// Get AI response from Gemini API
+async function getAIResponse(message) {
+    console.log('Getting AI response for:', message);
+    
+    // Ensure config is initialized
+    if (!window.AI_CONFIG) {
+        window.AI_CONFIG = {
+            apiKey: 'AIzaSyDud0VbsC-0C9CjVt5F3vpJugbhKD5wYQQ',
+            apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
+        };
+    }
+    
+    const requestBody = {
+        contents: [
+            {
+                parts: [
+                    {
+                        text: `You are Bytrox AI, a cybersecurity assistant. Answer this question: ${message}`
+                    }
+                ]
+            }
+        ]
+    };
+    
+    console.log('Request body:', JSON.stringify(requestBody, null, 2));
+
+    try {
+        console.log('Making API request to:', `${window.AI_CONFIG.apiUrl}?key=${window.AI_CONFIG.apiKey}`);
+        
+        const response = await fetch(`${window.AI_CONFIG.apiUrl}?key=${window.AI_CONFIG.apiKey}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('API Error Response:', errorText);
+            throw new Error(`API request failed: ${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+        console.log('API Response data:', data);
+        
+        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+            return data.candidates[0].content.parts[0].text;
+        } else if (data.error) {
+            throw new Error(`API Error: ${data.error.message}`);
+        } else {
+            console.error('Unexpected response format:', data);
+            throw new Error('Invalid response format from AI');
+        }
+    } catch (error) {
+        console.error('AI API Error details:', error);
+        if (error.message.includes('API_KEY_INVALID')) {
+            return 'Sorry, there seems to be an issue with the AI configuration. Please contact the administrator.';
+        } else if (error.message.includes('QUOTA_EXCEEDED')) {
+            return 'Sorry, the AI service is temporarily unavailable due to quota limits. Please try again later.';
+        } else if (error.message.includes('fetch')) {
+            return 'Sorry, there seems to be a network issue. Please check your internet connection and try again.';
+        } else {
+            return `Sorry, I encountered an error: ${error.message}`;
+        }
+    }
+}
+
+// Clear chat history
+function clearChat() {
+    const chatMessages = document.getElementById('chat-messages');
+    // Keep only the initial welcome message
+    const welcomeMessage = chatMessages.querySelector('.ai-message');
+    chatMessages.innerHTML = '';
+    if (welcomeMessage) {
+        chatMessages.appendChild(welcomeMessage);
+    }
+    
+    // Clear chat history array
+    window.chatHistory = [];
+    window.isAITyping = false;
+    
+    playClickSound();
+}
+
+// Show AI examples modal
+function showAIExamples() {
+    const modal = document.getElementById('ai-examples-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        playClickSound();
+    }
+}
+
+// Close AI examples modal
+function closeAIExamples() {
+    const modal = document.getElementById('ai-examples-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        playClickSound();
+    }
+}
+
+// Use example question
+function useExample(question) {
+    const userInput = document.getElementById('user-input');
+    if (userInput) {
+        userInput.value = question;
+        userInput.focus();
+    }
+    closeAIExamples();
+}
+
+// Update navigation to show AI chat
+function showAIChat() {
+    // Hide all sections
+    const sections = ['home', 'tools', 'subjects', 'achievements', 'about', 'tutorial'];
+    sections.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.style.display = 'none';
+        }
+    });
+    
+    // Show AI chat section
+    const aiChatSection = document.getElementById('ai-chat');
+    if (aiChatSection) {
+        aiChatSection.style.display = 'block';
+    }
+    
+    // Update navigation
+    updateNavigation('ai-chat');
+    
+    // Initialize chat if not already done
+    initializeAIChat();
+    
+    // Focus on input
+    setTimeout(() => {
+        const userInput = document.getElementById('user-input');
+        if (userInput) {
+            userInput.focus();
+        }
+    }, 100);
+}
+
+
+
+// Initialize AI Chat when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('AI Chat DOM loaded'); // Debug log
+    
+    // Add click handler for send button as backup
+    const sendButton = document.getElementById('send-button');
+    if (sendButton) {
+        sendButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Send button clicked via event listener');
+            sendMessage();
+        });
+        console.log('Send button event listener added');
+    }
+    
+    // Close modal when clicking outside
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('ai-examples-modal');
+        if (e.target === modal) {
+            closeAIExamples();
+        }
+    });
+    
+    // Initialize AI chat
+    initializeAIChat();
+});
+
+// Test function to verify everything works
+function testAI() {
+    console.log('Test function called');
+    alert('AI Chat test - functions are working!');
+}
+
+/* ================= END FREE AI ASSISTANT SYSTEM ================== */
+

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant Test - Bytrox</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 { color: #00ff88; text-align: center; }
+        .test-section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1rem 0;
+        }
+        button {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0.5rem;
+        }
+        button:hover { transform: translateY(-2px); }
+        .result {
+            background: #000;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            border-left: 3px solid #00ff88;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success { color: #00ff88; }
+        .info { color: #64b5f6; }
+    </style>
+</head>
+<body>
+    <h1>🤖 Free AI Assistant Test</h1>
+    
+    <div class="test-section">
+        <h3>🧪 Test AI Knowledge Base</h3>
+        <p>Click the buttons below to test different AI responses:</p>
+        
+        <button onclick="testQuestion('What is SQL injection?')">SQL Injection</button>
+        <button onclick="testQuestion('How to start pentesting?')">Getting Started</button>
+        <button onclick="testQuestion('Explain Nmap')">Nmap Tool</button>
+        <button onclick="testQuestion('Best hacking tools?')">Tools Question</button>
+        <button onclick="testQuestion('What certifications should I get?')">Certifications</button>
+        <button onclick="testQuestion('Is this legal?')">Legal/Ethics</button>
+        <button onclick="testQuestion('Random unknown topic')">Unknown Topic</button>
+        
+        <div id="test-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>✅ AI Features Included</h3>
+        <div class="info">
+        ✅ <strong>Comprehensive Knowledge Base:</strong> 10+ detailed topics<br>
+        ✅ <strong>Pattern Matching:</strong> Smart question understanding<br>
+        ✅ <strong>Formatted Responses:</strong> Rich text with examples<br>
+        ✅ <strong>Topic Suggestions:</strong> Related content recommendations<br>
+        ✅ <strong>Typing Animation:</strong> Realistic AI interaction<br>
+        ✅ <strong>Mobile Responsive:</strong> Works on all devices<br>
+        ✅ <strong>Free & Offline:</strong> No API keys or internet required<br>
+        ✅ <strong>Instant Responses:</strong> No rate limits or costs
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>🎯 Coverage Areas</h3>
+        <div class="info">
+        🔍 <strong>Security Concepts:</strong> SQL injection, XSS, cryptography<br>
+        🛠️ <strong>Essential Tools:</strong> Nmap, Metasploit, Burp Suite, Wireshark<br>
+        🎓 <strong>Learning Paths:</strong> Beginner guidance, study plans<br>
+        🏆 <strong>Certifications:</strong> CEH, OSCP, Security+, and more<br>
+        ⚖️ <strong>Ethics & Legal:</strong> Responsible disclosure, authorization<br>
+        🚀 <strong>Career Guidance:</strong> Professional development paths
+        </div>
+    </div>
+
+    <script>
+        // Simple AI test function (mimics the main AI logic)
+        function testQuestion(question) {
+            const resultDiv = document.getElementById('test-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `<div class="success">Testing: "${question}"</div>\n\nProcessing...`;
+            
+            // Simulate the AI response (simplified version)
+            setTimeout(() => {
+                let response = "🤔 I'm not sure about that specific topic, but I can help you with various ethical hacking concepts.";
+                let confidence = "low";
+                
+                const q = question.toLowerCase();
+                
+                if (q.includes('sql injection')) {
+                    response = `🔍 **SQL Injection** is a code injection technique that exploits security vulnerabilities...
+                    
+**Prevention:**
+✅ Use parameterized queries/prepared statements
+✅ Input validation and sanitization
+✅ Principle of least privilege for database accounts
+
+**Example vulnerable code:**
+SELECT * FROM users WHERE id = '\${userInput}'`;
+                    confidence = "high";
+                } else if (q.includes('start') || q.includes('beginner')) {
+                    response = `🚀 **Getting Started in Ethical Hacking:**
+
+**1. Foundation Knowledge:**
+• Learn networking fundamentals (TCP/IP, protocols)
+• Understand operating systems (Linux, Windows)
+• Basic programming/scripting (Python, Bash)
+
+**2. Essential Tools:**
+• Start with Kali Linux in a VM
+• Practice with Nmap for scanning`;
+                    confidence = "medium";
+                } else if (q.includes('nmap')) {
+                    response = `🗺️ **Nmap** (Network Mapper) is the most popular network discovery tool.
+
+**Common Scans:**
+nmap -sS target - TCP SYN scan (stealthy)
+nmap -sV target - Version detection
+nmap -A target - Aggressive scan`;
+                    confidence = "high";
+                } else if (q.includes('tools')) {
+                    response = `🛠️ **Essential Ethical Hacking Tools:**
+
+**Reconnaissance:**
+• Nmap - Network scanning
+• Maltego - OSINT analysis
+
+**Web Application Testing:**
+• Burp Suite - Web proxy and scanner
+• OWASP ZAP - Free web scanner`;
+                    confidence = "medium";
+                } else if (q.includes('cert')) {
+                    response = `🏆 **Popular Ethical Hacking Certifications:**
+
+**Beginner Level:**
+• CompTIA Security+ - Foundation security knowledge
+• CEH (Certified Ethical Hacker) - Entry-level ethical hacking
+
+**Advanced Level:**
+• OSCP - Offensive Security Certified Professional`;
+                    confidence = "medium";
+                } else if (q.includes('legal') || q.includes('ethics')) {
+                    response = `⚖️ **Legal and Ethical Considerations:**
+
+**Golden Rules:**
+🚫 NEVER test systems you don't own
+✅ ALWAYS get written permission
+✅ RESPECT scope and boundaries
+
+Remember: "Just because you can, doesn't mean you should."`;
+                    confidence = "medium";
+                }
+                
+                resultDiv.innerHTML = `<div class="success">✅ AI Response (Confidence: ${confidence})</div>\n\n${response}`;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
