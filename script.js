@@ -8470,6 +8470,10 @@ function initializeAIChat() {
 // Send message function - Define globally
 async function sendMessage() {
     console.log('sendMessage called'); // Debug log
+    
+    // Make sure this function is globally accessible
+    window.sendMessage = sendMessage;
+    
     const userInput = document.getElementById('user-input');
     const sendButton = document.getElementById('send-button');
     
@@ -8505,16 +8509,19 @@ async function sendMessage() {
     
     try {
         // Get AI response
+        console.log('Calling getAIResponse...');
         const response = await getAIResponse(message);
+        console.log('AI response received:', response);
         
         // Remove typing indicator and add AI response
         removeTypingIndicator();
         addMessageToChat(response, 'ai');
+        console.log('AI message added to chat');
         
     } catch (error) {
         console.error('AI Error:', error);
         removeTypingIndicator();
-        addMessageToChat('Sorry, I encountered an error. Please try again later.', 'ai');
+        addMessageToChat(`Sorry, I encountered an error: ${error.message}`, 'ai');
     } finally {
         // Re-enable input
         sendButton.disabled = false;
@@ -8611,7 +8618,7 @@ async function getAIResponse(message) {
     // Enhanced security: Check if config is properly loaded
     if (!window.AI_CONFIG || !window.AI_CONFIG.apiKey || 
         window.AI_CONFIG.apiKey === 'YOUR_GOOGLE_API_KEY_HERE' ||
-        window.AI_CONFIG.apiKey.length < 20 ||
+        window.AI_CONFIG.apiKey.length < 10 ||
         window.AI_CONFIG.apiKey === '') {
         throw new Error('API configuration not properly set. Please check your config.js file and ensure you have a valid Google API key.');
     }
@@ -8798,6 +8805,9 @@ function openSettings() {
     console.log('Settings clicked');
     alert('Settings feature coming soon!');
 }
+
+// Ensure sendMessage is globally accessible
+window.sendMessage = sendMessage;
 
 /* ================= END FREE AI ASSISTANT SYSTEM ================== */
 

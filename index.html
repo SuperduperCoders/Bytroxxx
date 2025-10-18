@@ -1290,8 +1290,8 @@
                     
                     <div class="chat-input-container">
                         <div class="input-group">
-                            <input type="text" id="user-input" class="chat-input" placeholder="Ask me anything..." maxlength="1000" autocomplete="off">
-                            <button id="send-button" class="send-button" onclick="sendMessage()" title="Send message">
+                            <input type="text" id="user-input" class="chat-input" placeholder="Ask me anything..." maxlength="1000" autocomplete="off" onkeypress="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); simpleChat();}">
+                            <button id="send-button" class="send-button" onclick="simpleChat()" title="Send message">
                                 <span class="send-icon">➤</span>
                             </button>
                         </div>
@@ -1695,6 +1695,7 @@
 
     <!-- Load configuration first -->
     <script src="config.js"></script>
+    <script src="simple-chat.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
