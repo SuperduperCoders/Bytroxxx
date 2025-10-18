@@ -7,6 +7,11 @@ let achievements = JSON.parse(localStorage.getItem('bytroxAchievements')) || [];
 let particles = [];
 let bytcoins = JSON.parse(localStorage.getItem('bytroxBytcoins')) || 0;
 
+// Version tracking for updates
+const BYTROX_VERSION = '2.1.0';
+const LAST_UPDATE = '2025-10-18';
+let lastKnownVersion = localStorage.getItem('bytroxVersion') || '1.0.0';
+
 // Audio system removed
 
 // Performance optimizations
@@ -969,8 +974,76 @@ function animateNumber(elementId, targetValue, suffix = '') {
     requestAnimationFrame(updateNumber);
 }
 
+// Check for updates and show notification if needed
+function checkForUpdates() {
+    if (lastKnownVersion !== BYTROX_VERSION) {
+        setTimeout(() => {
+            showUpdateNotification();
+            localStorage.setItem('bytroxVersion', BYTROX_VERSION);
+        }, 2000); // Show after 2 seconds
+    }
+}
+
+function showUpdateNotification() {
+    const updateNotification = document.createElement('div');
+    updateNotification.className = 'update-notification';
+    updateNotification.innerHTML = `
+        <div class="update-content">
+            <div class="update-icon">🚀</div>
+            <div class="update-info">
+                <h4>Bytrox Updated!</h4>
+                <p>Version ${BYTROX_VERSION} - New features and improvements available!</p>
+                <div class="update-details">
+                    <ul>
+                        <li>Enhanced security tutorials</li>
+                        <li>Improved user interface</li>
+                        <li>Better performance optimizations</li>
+                        <li>Latest 2025 cybersecurity techniques</li>
+                    </ul>
+                </div>
+            </div>
+            <button class="update-close" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+    `;
+    
+    updateNotification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: -450px;
+        z-index: 1001;
+        background: linear-gradient(135deg, #00ff88, #00cc77);
+        color: #0a0a0a;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 255, 136, 0.4);
+        transition: right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        max-width: 400px;
+        font-family: 'Inter', sans-serif;
+    `;
+    
+    document.body.appendChild(updateNotification);
+    
+    // Animate in
+    setTimeout(() => {
+        updateNotification.style.right = '20px';
+    }, 100);
+    
+    // Auto-hide after 8 seconds
+    setTimeout(() => {
+        updateNotification.style.right = '-450px';
+        setTimeout(() => {
+            if (updateNotification.parentElement) {
+                updateNotification.remove();
+            }
+        }, 500);
+    }, 8000);
+}
+
 // Initialize achievement system when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    // Check for updates
+    checkForUpdates();
+    
     // Audio system removed
     
     // Initialize and sync Bytcoins data

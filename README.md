@@ -12,7 +12,7 @@
 
 **🎯 Master Ethical Hacking Through Interactive Learning**
 
-*A comprehensive, hands-on cybersecurity education platform with 14+ subjects, 200+ tutorial steps, and built-in AI assistant.*
+*A comprehensive, hands-on cybersecurity education platform with 28+ subjects, 450+ tutorial steps, and built-in AI assistant. Updated October 2025.*
 
 </div>
 
@@ -24,8 +24,8 @@ Bytrox is a modern, interactive ethical hacking learning platform designed to pr
 
 ### ✨ Key Features
 
-- 🎓 **14+ Comprehensive Subjects** - From reconnaissance to web security
-- 📚 **200+ Interactive Steps** - Hands-on tutorials with practical examples
+- 🎓 **28+ Comprehensive Subjects** - From reconnaissance to advanced red teaming
+- 📚 **450+ Interactive Steps** - Hands-on tutorials with practical examples
 - 🤖 **Built-in AI Assistant** - Free, offline AI support for learning
 - 🎮 **Gamified Learning** - Progress tracking, achievements, and challenges
 - 🪙 **Bytcoins Currency** - Earn 5 Bytcoins for each completed subject
