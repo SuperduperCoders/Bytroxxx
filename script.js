@@ -5,13 +5,9 @@ let totalSteps = 0;
 let userProgress = JSON.parse(localStorage.getItem('bytroxProgress')) || {};
 let achievements = JSON.parse(localStorage.getItem('bytroxAchievements')) || [];
 let particles = [];
+let bytcoins = JSON.parse(localStorage.getItem('bytroxBytcoins')) || 0;
 
-// Audio system
-let backgroundMusic = null;
-let clickSound = null;
-let audioEnabled = JSON.parse(localStorage.getItem('bytroxAudioEnabled')) || false;
-let musicVolume = parseFloat(localStorage.getItem('bytroxMusicVolume')) || 0.3;
-let sfxVolume = parseFloat(localStorage.getItem('bytroxSfxVolume')) || 0.5;
+// Audio system removed
 
 // Performance optimizations
 let animationFrameId = null;
@@ -44,217 +40,11 @@ function throttle(func, limit) {
     }
 }
 
-// Audio System Functions
-function initializeAudio() {
-    // Always use synthetic audio for better compatibility and performance
-    console.log('Initializing Bytrox Audio System with Web Audio API');
-    
-    // Initialize synthetic audio system
-    createSyntheticBackgroundMusic();
-    
-    // Auto-play background music if enabled
-    if (audioEnabled) {
-        // Delay to allow user interaction (required for Web Audio)
-        setTimeout(() => {
-            playBackgroundMusic();
-        }, 1000);
-    }
-    
-    // Add audio controls to the page
-    createAudioControls();
-    
-    // Add visual audio indicator
-    createAudioVisualizer();
-}
+// Audio functions removed
 
-function createSyntheticBackgroundMusic() {
-    // Create a Web Audio API context for synthetic background music
-    if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
-        const AudioContextClass = AudioContext || webkitAudioContext;
-        let audioContext = null;
-        let musicNodes = {
-            oscillators: [],
-            gainNodes: [],
-            filters: []
-        };
-        let isPlaying = false;
-        
-        function initAudioContext() {
-            if (!audioContext) {
-                audioContext = new AudioContextClass();
-            }
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
-        }
-        
-        function startSyntheticMusic() {
-            if (!audioEnabled || isPlaying) return;
-            
-            initAudioContext();
-            isPlaying = true;
-            
-            // Create multiple layers for a richer cyberpunk ambient sound
-            createAmbientLayer(55, 0.02); // Sub bass
-            createAmbientLayer(110, 0.03); // Bass
-            createAmbientLayer(220, 0.015); // Mid
-            createPadLayer(440, 0.01); // High pad
-            
-            // Add subtle rhythmic pulse
-            createPulseLayer();
-        }
-        
-        function createAmbientLayer(frequency, volume) {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            const filter = audioContext.createBiquadFilter();
-            
-            // Setup filter
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(frequency * 2, audioContext.currentTime);
-            filter.Q.setValueAtTime(1, audioContext.currentTime);
-            
-            // Connect nodes
-            oscillator.connect(filter);
-            filter.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            // Configure oscillator
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-            
-            // Add subtle frequency modulation
-            const lfo = audioContext.createOscillator();
-            const lfoGain = audioContext.createGain();
-            lfo.type = 'triangle';
-            lfo.frequency.setValueAtTime(0.05 + Math.random() * 0.1, audioContext.currentTime);
-            lfoGain.gain.setValueAtTime(frequency * 0.02, audioContext.currentTime);
-            lfo.connect(lfoGain);
-            lfoGain.connect(oscillator.frequency);
-            
-            // Setup gain envelope
-            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(musicVolume * volume, audioContext.currentTime + 3);
-            
-            // Start oscillators
-            oscillator.start();
-            lfo.start();
-            
-            // Store references
-            musicNodes.oscillators.push(oscillator, lfo);
-            musicNodes.gainNodes.push(gainNode, lfoGain);
-            musicNodes.filters.push(filter);
-        }
-        
-        function createPadLayer(frequency, volume) {
-            const oscillator1 = audioContext.createOscillator();
-            const oscillator2 = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            const filter = audioContext.createBiquadFilter();
-            
-            // Slightly detuned oscillators for chorus effect
-            oscillator1.type = 'sawtooth';
-            oscillator2.type = 'sawtooth';
-            oscillator1.frequency.setValueAtTime(frequency, audioContext.currentTime);
-            oscillator2.frequency.setValueAtTime(frequency * 1.005, audioContext.currentTime);
-            
-            // Setup filter
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(frequency * 1.5, audioContext.currentTime);
-            filter.Q.setValueAtTime(2, audioContext.currentTime);
-            
-            // Connect
-            oscillator1.connect(filter);
-            oscillator2.connect(filter);
-            filter.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            // Envelope
-            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(musicVolume * volume, audioContext.currentTime + 4);
-            
-            oscillator1.start();
-            oscillator2.start();
-            
-            musicNodes.oscillators.push(oscillator1, oscillator2);
-            musicNodes.gainNodes.push(gainNode);
-            musicNodes.filters.push(filter);
-        }
-        
-        function createPulseLayer() {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            const pulseGain = audioContext.createGain();
-            
-            oscillator.type = 'square';
-            oscillator.frequency.setValueAtTime(55, audioContext.currentTime);
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(pulseGain);
-            pulseGain.connect(audioContext.destination);
-            
-            // Create pulse pattern
-            gainNode.gain.setValueAtTime(musicVolume * 0.005, audioContext.currentTime);
-            
-            // Pulse LFO
-            const pulseLfo = audioContext.createOscillator();
-            const pulseLfoGain = audioContext.createGain();
-            pulseLfo.type = 'square';
-            pulseLfo.frequency.setValueAtTime(0.25, audioContext.currentTime); // 4-second cycle
-            pulseLfoGain.gain.setValueAtTime(musicVolume * 0.003, audioContext.currentTime);
-            pulseLfo.connect(pulseLfoGain);
-            pulseLfoGain.connect(pulseGain.gain);
-            
-            oscillator.start();
-            pulseLfo.start();
-            
-            musicNodes.oscillators.push(oscillator, pulseLfo);
-            musicNodes.gainNodes.push(gainNode, pulseLfoGain, pulseGain);
-        }
-        
-        function stopSyntheticMusic() {
-            if (!isPlaying) return;
-            
-            isPlaying = false;
-            
-            // Fade out all gain nodes
-            musicNodes.gainNodes.forEach(gainNode => {
-                try {
-                    gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 2);
-                } catch (e) {
-                    // Handle gain nodes that might be LFO gains
-                }
-            });
-            
-            // Stop all oscillators after fade
-            setTimeout(() => {
-                musicNodes.oscillators.forEach(osc => {
-                    try {
-                        osc.stop();
-                    } catch (e) {
-                        // Oscillator might already be stopped
-                    }
-                });
-                
-                // Clear arrays
-                musicNodes.oscillators = [];
-                musicNodes.gainNodes = [];
-                musicNodes.filters = [];
-            }, 2000);
-        }
-        
-        // Replace background music methods
-        window.startSyntheticMusic = startSyntheticMusic;
-        window.stopSyntheticMusic = stopSyntheticMusic;
-    }
-}
+// Audio functions removed
 
-function playClickSound() {
-    if (!audioEnabled) return;
-    
-    // Always use synthetic click sound for consistency and reliability
-    createSyntheticClickSound();
-}
+// Audio functions removed
 
 function createSyntheticClickSound() {
     if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
@@ -340,14 +130,44 @@ function createNoiseClick(audioContext) {
 function playBackgroundMusic() {
     if (!audioEnabled) return;
     
-    // Always use synthetic music for reliability
+    // Prefer the DOM audio element if it has a valid source
+    try {
+        if (backgroundMusic && backgroundMusic.currentSrc) {
+            // Ensure audio context/resume on first user gesture (some browsers require it)
+            backgroundMusic.volume = musicVolume;
+            const playPromise = backgroundMusic.play();
+            if (playPromise && typeof playPromise.then === 'function') {
+                playPromise.catch((e) => {
+                    // If play fails (autoplay policy), fall back to synthetic music
+                    console.warn('DOM audio playback prevented, falling back to synthetic music.', e);
+                    if (window.startSyntheticMusic) window.startSyntheticMusic();
+                });
+            }
+            return;
+        }
+    } catch (e) {
+        console.warn('Error attempting to play DOM audio, falling back to synthetic:', e);
+    }
+
+    // Fall back to synthetic music if no DOM audio is available
     if (window.startSyntheticMusic) {
         window.startSyntheticMusic();
     }
 }
 
 function stopBackgroundMusic() {
-    // Always use synthetic music
+    // Stop DOM audio if present
+    try {
+        if (backgroundMusic && !backgroundMusic.paused) {
+            backgroundMusic.pause();
+            backgroundMusic.currentTime = 0;
+            return;
+        }
+    } catch (e) {
+        console.warn('Error stopping DOM audio, will attempt synthetic stop', e);
+    }
+
+    // Otherwise stop synthetic music
     if (window.stopSyntheticMusic) {
         window.stopSyntheticMusic();
     }
@@ -376,9 +196,17 @@ function setMusicVolume(volume) {
     musicVolume = Math.max(0, Math.min(1, volume));
     localStorage.setItem('bytroxMusicVolume', musicVolume.toString());
     
-    if (backgroundMusic) {
-        backgroundMusic.volume = musicVolume;
+    // Sync volume with DOM audio if present
+    try {
+        if (backgroundMusic && backgroundMusic.currentSrc) {
+            backgroundMusic.volume = musicVolume;
+        }
+    } catch (e) {
+        // DOM audio not available or error occurred
     }
+    
+    // Note: Synthetic music volume is handled by the Web Audio API system
+    // and uses the musicVolume global directly in createAmbientLayer() etc.
 }
 
 function setSfxVolume(volume) {
@@ -414,6 +242,10 @@ function createAudioControls() {
                     <input type="range" id="sfxVolume" min="0" max="1" step="0.1" value="${sfxVolume}">
                     <span class="volume-value">${Math.round(sfxVolume * 100)}%</span>
                 </div>
+            </div>
+            <div class="music-controls" style="margin-top:0.5rem; display:flex; gap:0.5rem; align-items:center;">
+                <button id="musicPlayPause" class="tool-btn">${audioEnabled ? 'Pause' : 'Play'}</button>
+                <span style="font-size:0.9rem; opacity:0.85;">Use a real MP3 by placing it at <code>assets/music/track.mp3</code></span>
             </div>
             <button class="audio-controls-close">×</button>
         </div>
@@ -451,6 +283,37 @@ function createAudioControls() {
     
     window.audioControlsPanel = audioControls;
     window.audioButton = audioButton;
+
+    // Wire play/pause button for DOM audio
+    const playPauseBtn = document.getElementById('musicPlayPause');
+    if (playPauseBtn) {
+        playPauseBtn.addEventListener('click', () => {
+            if (backgroundMusic && backgroundMusic.currentSrc) {
+                if (backgroundMusic.paused) {
+                    backgroundMusic.volume = musicVolume;
+                    backgroundMusic.play().catch(() => {
+                        // ignore
+                    });
+                    playPauseBtn.textContent = 'Pause';
+                } else {
+                    backgroundMusic.pause();
+                    playPauseBtn.textContent = 'Play';
+                }
+            } else {
+                // Toggle synthetic music when no DOM source
+                if (window.startSyntheticMusic && window.stopSyntheticMusic) {
+                    // Use audioEnabled state as indicator
+                    if (audioEnabled) {
+                        stopBackgroundMusic();
+                        playPauseBtn.textContent = 'Play';
+                    } else {
+                        playBackgroundMusic();
+                        playPauseBtn.textContent = 'Pause';
+                    }
+                }
+            }
+        });
+    }
 }
 
 function updateAudioControlsUI() {
@@ -1108,11 +971,17 @@ function animateNumber(elementId, targetValue, suffix = '') {
 
 // Initialize achievement system when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize audio system
-    initializeAudio();
+    // Audio system removed
     
-    // Add universal click sound to all buttons and interactive elements
-    addUniversalClickSounds();
+    // Initialize and sync Bytcoins data
+    syncBytcoinsData();
+    updateBytcoinsDisplay();
+    
+    // Update progress bars to show completion badges
+    updateProgressBars();
+    
+    // Initialize secret subjects
+    initializeSecretSubjects();
     
     if (document.getElementById('achievements')) {
         initializeAchievementFilters();
@@ -1339,6 +1208,17 @@ style.textContent = `
         }
     }
     
+    @keyframes coinFall {
+        0% {
+            transform: translateY(-50px) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(100vh) rotate(360deg);
+            opacity: 0;
+        }
+    }
+    
     .achievement-notification .notification-content {
         display: flex;
         align-items: center;
@@ -1390,6 +1270,26 @@ function updateProgressBars() {
             const completedSteps = userProgress[subject].completed.length;
             const percentage = (completedSteps / totalSteps) * 100;
             progressBar.style.width = `${percentage}%`;
+            
+            // Add visual indicator for completed subjects
+            if (userProgress[subject].completedSubject) {
+                card.classList.add('subject-completed');
+                // Add or update completion badge
+                let completionBadge = card.querySelector('.completion-badge');
+                if (!completionBadge) {
+                    completionBadge = document.createElement('div');
+                    completionBadge.className = 'completion-badge';
+                    completionBadge.innerHTML = '✅';
+                    completionBadge.title = 'Subject completed - Bytcoins already earned';
+                    card.appendChild(completionBadge);
+                }
+            } else {
+                card.classList.remove('subject-completed');
+                const completionBadge = card.querySelector('.completion-badge');
+                if (completionBadge) {
+                    completionBadge.remove();
+                }
+            }
         }
     });
 }
@@ -1994,14 +1894,24 @@ function nextStep() {
             localStorage.setItem('bytroxProgress', JSON.stringify(userProgress));
         }
         
+        // Check if subject was already completed before
+        const wasAlreadyCompleted = userProgress[currentSubject].completedSubject;
+        
         // Mark subject as fully completed
         userProgress[currentSubject].completedSubject = true;
         localStorage.setItem('bytroxProgress', JSON.stringify(userProgress));
         
-        // Check achievements
-        checkAchievements();
-        
-        alert('🎉 Congratulations! You have completed this tutorial.');
+        // Award 5 Bytcoins only for first-time completion
+        if (!wasAlreadyCompleted) {
+            addBytcoins(5);
+            // Check achievements
+            checkAchievements();
+            alert('🎉 Congratulations! You have completed this tutorial and earned 5 Bytcoins!');
+        } else {
+            // Check achievements even on repeat completion (for other achievements)
+            checkAchievements();
+            alert('🎉 Congratulations! You have completed this tutorial again! (No additional Bytcoins - already earned for this subject)');
+        }
         goBackToSubjects();
     }
 }
@@ -4246,6 +4156,154 @@ cat /etc/rc.local`,
                 tips: 'Use SIEM tools and log aggregation platforms to centralize and analyze security data effectively.'
             }
         ]
+    },
+    
+    // Secret Subjects
+    'password-cracking': {
+        title: 'Password Cracking',
+        steps: [
+            {
+                title: 'Introduction to Password Security',
+                description: `
+                    <p><strong>⚠️ ETHICAL USE ONLY ⚠️</strong></p>
+                    <p>This course covers password security testing for authorized penetration testing and security assessments only.</p>
+                    <p><strong>What you'll learn:</strong></p>
+                    <ul>
+                        <li>Password complexity analysis</li>
+                        <li>Hash function vulnerabilities</li>
+                        <li>Dictionary and brute force techniques</li>
+                        <li>Rainbow table attacks</li>
+                        <li>Password storage best practices</li>
+                    </ul>
+                `,
+                code: `# Password strength analysis
+# Check password entropy
+echo "password123" | wc -c
+
+# Analyze password patterns
+grep -E "^[a-z]+[0-9]+$" passwords.txt`,
+                tips: 'Always obtain explicit written authorization before conducting password security assessments.'
+            },
+            {
+                title: 'Hash Analysis and Identification',
+                description: `
+                    <p>Understanding different hash types is crucial for password recovery and security testing.</p>
+                    <p><strong>Common hash types:</strong></p>
+                    <ul>
+                        <li>MD5 (32 characters)</li>
+                        <li>SHA1 (40 characters)</li>
+                        <li>SHA256 (64 characters)</li>
+                        <li>bcrypt (adaptive hashing)</li>
+                        <li>NTLM (Windows hashes)</li>
+                    </ul>
+                `,
+                code: `# Hash identification
+hashid hash_value
+
+# Generate test hashes
+echo -n "password" | md5sum
+echo -n "password" | sha1sum
+echo -n "password" | sha256sum`,
+                tips: 'Use tools like hashcat or john for hash identification and cracking in authorized tests.'
+            },
+            {
+                title: 'Dictionary Attacks',
+                description: `
+                    <p>Dictionary attacks use wordlists of common passwords to crack hashes efficiently.</p>
+                    <p><strong>Popular wordlists:</strong></p>
+                    <ul>
+                        <li>rockyou.txt</li>
+                        <li>SecLists</li>
+                        <li>Custom wordlists</li>
+                        <li>Leaked password databases</li>
+                    </ul>
+                `,
+                code: `# Hashcat dictionary attack (example)
+hashcat -m 0 -a 0 hashes.txt rockyou.txt
+
+# John the Ripper dictionary attack
+john --wordlist=rockyou.txt hashes.txt
+
+# Create custom wordlist
+crunch 6 8 -t @@@@@@`,
+                tips: 'Combine multiple wordlists and use rule-based attacks for better coverage.'
+            }
+        ]
+    },
+    
+    'webcam-access': {
+        title: 'Webcam Security Testing',
+        steps: [
+            {
+                title: 'Camera Security Fundamentals',
+                description: `
+                    <p><strong>⚠️ ETHICAL USE ONLY ⚠️</strong></p>
+                    <p>This course covers webcam security testing for authorized assessments and privacy protection only.</p>
+                    <p><strong>What you'll learn:</strong></p>
+                    <ul>
+                        <li>Camera privacy indicators</li>
+                        <li>Access control mechanisms</li>
+                        <li>Malware detection techniques</li>
+                        <li>Network camera security</li>
+                        <li>Privacy protection methods</li>
+                    </ul>
+                `,
+                code: `# Check camera access permissions (Linux)
+ls -la /dev/video*
+lsof | grep video
+
+# Windows camera access check
+powershell "Get-WmiObject Win32_PnPEntity | Where-Object {$_.Name -match 'camera'}"`,
+                tips: 'Always respect privacy laws and obtain proper authorization before testing camera security.'
+            },
+            {
+                title: 'Network Camera Discovery',
+                description: `
+                    <p>Learn to identify and assess network-connected cameras for security vulnerabilities.</p>
+                    <p><strong>Common vulnerabilities:</strong></p>
+                    <ul>
+                        <li>Default credentials</li>
+                        <li>Unencrypted streams</li>
+                        <li>Outdated firmware</li>
+                        <li>Weak authentication</li>
+                        <li>Open ports and services</li>
+                    </ul>
+                `,
+                code: `# Network camera discovery
+nmap -p 80,443,554,8080 192.168.1.0/24
+
+# Check for default credentials
+curl -u admin:admin http://camera-ip/
+
+# RTSP stream detection
+nmap --script rtsp-url-brute -p 554 target-ip`,
+                tips: 'Use Shodan and similar search engines to understand exposure patterns, but only test authorized systems.'
+            },
+            {
+                title: 'Privacy Protection Techniques',
+                description: `
+                    <p>Implement and test camera privacy protection measures.</p>
+                    <p><strong>Protection methods:</strong></p>
+                    <ul>
+                        <li>Physical camera covers</li>
+                        <li>Software access controls</li>
+                        <li>Network segmentation</li>
+                        <li>Firmware updates</li>
+                        <li>Activity monitoring</li>
+                    </ul>
+                `,
+                code: `# Monitor camera access (Linux)
+auditctl -w /dev/video0 -p rwxa
+
+# Disable camera device
+sudo modprobe -r uvcvideo
+
+# Check camera processes
+ps aux | grep -i camera
+lsof | grep video`,
+                tips: 'Implement defense in depth with multiple layers of camera security controls.'
+            }
+        ]
     }
 };
 
@@ -4417,6 +4475,10 @@ document.addEventListener('keydown', function(e) {
                 e.preventDefault();
                 scrollToSection('about');
                 break;
+            case 'r':
+                e.preventDefault();
+                openRedeemCode();
+                break;
         }
     }
     
@@ -4443,6 +4505,7 @@ let userProfile = JSON.parse(localStorage.getItem('bytroxProfile')) || {
     level: 1,
     experience: 0,
     skillPoints: 0,
+    bytcoins: 0,
     preferredLearningStyle: 'interactive',
     lastLogin: new Date().toISOString(),
     sessionHistory: [],
@@ -4470,6 +4533,28 @@ let userProfile = JSON.parse(localStorage.getItem('bytroxProfile')) || {
         autoSave: true
     }
 };
+
+// Sync Bytcoins data between localStorage and userProfile
+function syncBytcoinsData() {
+    // Get Bytcoins from separate localStorage if it exists
+    const storedBytcoins = JSON.parse(localStorage.getItem('bytroxBytcoins'));
+    
+    if (storedBytcoins !== null) {
+        bytcoins = storedBytcoins;
+        userProfile.bytcoins = bytcoins;
+    } else if (userProfile.bytcoins !== undefined) {
+        bytcoins = userProfile.bytcoins;
+        localStorage.setItem('bytroxBytcoins', JSON.stringify(bytcoins));
+    } else {
+        // Initialize if both are undefined
+        bytcoins = 0;
+        userProfile.bytcoins = 0;
+        localStorage.setItem('bytroxBytcoins', JSON.stringify(0));
+    }
+    
+    // Save updated profile
+    localStorage.setItem('bytroxProfile', JSON.stringify(userProfile));
+}
 
 // Enhanced Player Data Management
 let playerStats = JSON.parse(localStorage.getItem('bytroxPlayerStats')) || {
@@ -4534,6 +4619,9 @@ function loadProfileData() {
     }
     if (document.getElementById('profile-longest-streak')) {
         document.getElementById('profile-longest-streak').textContent = userProfile.longestStreak;
+    }
+    if (document.getElementById('profile-bytcoins')) {
+        document.getElementById('profile-bytcoins').textContent = userProfile.bytcoins || 0;
     }
     
     // Update auto-save toggle
@@ -4740,6 +4828,599 @@ function addExperience(points) {
     
     // Update rank
     updatePlayerRank();
+}
+
+// Bytcoins management functions
+function addBytcoins(amount) {
+    bytcoins += amount;
+    userProfile.bytcoins = bytcoins;
+    localStorage.setItem('bytroxBytcoins', JSON.stringify(bytcoins));
+    localStorage.setItem('bytroxUserProfile', JSON.stringify(userProfile));
+    
+    // Show notification for earning Bytcoins
+    if (amount > 0) {
+        showBytcoinsNotification(amount);
+        updateBytcoinsDisplay();
+    }
+}
+
+function getBytcoins() {
+    return bytcoins;
+}
+
+function spendBytcoins(amount) {
+    if (bytcoins >= amount) {
+        bytcoins -= amount;
+        userProfile.bytcoins = bytcoins;
+        localStorage.setItem('bytroxBytcoins', JSON.stringify(bytcoins));
+        localStorage.setItem('bytroxUserProfile', JSON.stringify(userProfile));
+        updateBytcoinsDisplay();
+        return true;
+    }
+    return false;
+}
+
+function showBytcoinsNotification(amount) {
+    const notification = document.createElement('div');
+    notification.className = 'bytcoins-notification';
+    notification.innerHTML = `
+        <div class="bytcoins-content">
+            <div class="bytcoins-icon">🪙</div>
+            <div class="bytcoins-text">
+                <div class="bytcoins-title">+${amount} Bytcoins Earned!</div>
+                <div class="bytcoins-subtitle">Subject completed successfully</div>
+            </div>
+        </div>
+    `;
+    
+    // Add notification styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 120px;
+        right: -400px;
+        z-index: 1001;
+        background: linear-gradient(135deg, #ffd700, #ffaa00);
+        color: #000;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+        transition: right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        max-width: 350px;
+        font-weight: 600;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.right = '20px';
+    }, 100);
+    
+    // Animate out
+    setTimeout(() => {
+        notification.style.right = '-400px';
+        setTimeout(() => {
+            notification.remove();
+        }, 500);
+    }, 3000);
+    
+    // Add coin animation effect
+    createCoinAnimation();
+}
+
+function createCoinAnimation() {
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            const coin = document.createElement('div');
+            coin.innerHTML = '🪙';
+            coin.style.cssText = `
+                position: fixed;
+                font-size: 2rem;
+                left: ${Math.random() * 100}vw;
+                top: -50px;
+                pointer-events: none;
+                z-index: 1000;
+                animation: coinFall 2s ease-in forwards;
+            `;
+            
+            document.body.appendChild(coin);
+            
+            setTimeout(() => {
+                coin.remove();
+            }, 2000);
+        }, i * 100);
+    }
+}
+
+function updateBytcoinsDisplay() {
+    // Update main Bytcoins display in header
+    const bytcoinsDisplay = document.getElementById('bytcoins-display');
+    if (bytcoinsDisplay) {
+        bytcoinsDisplay.textContent = bytcoins;
+    }
+    
+    // Update profile displays
+    const profileBytcoins = document.getElementById('profile-bytcoins');
+    if (profileBytcoins) {
+        profileBytcoins.textContent = bytcoins;
+    }
+}
+
+// Test function to simulate earning Bytcoins (for development/testing)
+function testBytcoinsReward() {
+    console.log('Testing Bytcoins reward system...');
+    addBytcoins(5);
+    console.log(`Current Bytcoins: ${bytcoins}`);
+    return `Earned 5 Bytcoins! Total: ${bytcoins}`;
+}
+
+// Test function to simulate completing a subject
+function testSubjectCompletion(subjectName = 'reconnaissance') {
+    console.log(`Testing subject completion for: ${subjectName}`);
+    
+    // Check if already completed
+    if (userProgress[subjectName] && userProgress[subjectName].completedSubject) {
+        console.log(`Subject ${subjectName} already completed. No additional Bytcoins.`);
+        return `Subject ${subjectName} already completed - no new Bytcoins earned.`;
+    }
+    
+    // Initialize subject progress if needed
+    if (!userProgress[subjectName]) {
+        userProgress[subjectName] = { completed: [] };
+    }
+    
+    // Mark as completed and award Bytcoins
+    userProgress[subjectName].completedSubject = true;
+    localStorage.setItem('bytroxProgress', JSON.stringify(userProgress));
+    addBytcoins(5);
+    updateProgressBars();
+    
+    console.log(`Subject ${subjectName} completed! Current Bytcoins: ${bytcoins}`);
+    return `Subject ${subjectName} completed! Earned 5 Bytcoins. Total: ${bytcoins}`;
+}
+
+// Function to reset a specific subject completion for testing
+function resetSubjectCompletion(subjectName = 'reconnaissance') {
+    if (userProgress[subjectName]) {
+        userProgress[subjectName].completedSubject = false;
+        localStorage.setItem('bytroxProgress', JSON.stringify(userProgress));
+        updateProgressBars();
+        console.log(`Subject ${subjectName} completion reset`);
+        return `Subject ${subjectName} reset successfully!`;
+    }
+    return `Subject ${subjectName} not found in progress.`;
+}
+
+// Function to reset Bytcoins for testing
+function resetBytcoins() {
+    bytcoins = 0;
+    userProfile.bytcoins = 0;
+    localStorage.setItem('bytroxBytcoins', JSON.stringify(0));
+    localStorage.setItem('bytroxProfile', JSON.stringify(userProfile));
+    updateBytcoinsDisplay();
+    console.log('Bytcoins reset to 0');
+    return 'Bytcoins reset successfully!';
+}
+
+// Function to reset all progress for testing
+function resetAllProgress() {
+    userProgress = {};
+    bytcoins = 0;
+    userProfile.bytcoins = 0;
+    localStorage.setItem('bytroxProgress', JSON.stringify(userProgress));
+    localStorage.setItem('bytroxBytcoins', JSON.stringify(0));
+    localStorage.setItem('bytroxProfile', JSON.stringify(userProfile));
+    updateBytcoinsDisplay();
+    updateProgressBars();
+    console.log('All progress reset');
+    return 'All progress and Bytcoins reset successfully!';
+}
+
+// Secret Subjects Management
+let unlockedSecretSubjects = JSON.parse(localStorage.getItem('bytroxUnlockedSecrets')) || [];
+
+function handleSecretSubject(subjectName) {
+    // Check if already unlocked
+    if (unlockedSecretSubjects.includes(subjectName)) {
+        startTutorial(subjectName);
+        return;
+    }
+    
+    // Get the cost for this subject
+    const subjectCard = document.querySelector(`[onclick="handleSecretSubject('${subjectName}')"]`);
+    const cost = parseInt(subjectCard.dataset.cost) || 500;
+    
+    showSecretSubjectModal(subjectName, cost);
+}
+
+function showSecretSubjectModal(subjectName, cost) {
+    const subjectTitles = {
+        'password-cracking': 'Password Cracking',
+        'webcam-access': 'Webcam Access'
+    };
+    
+    const title = subjectTitles[subjectName] || subjectName;
+    
+    const modal = document.createElement('div');
+    modal.className = 'secret-modal';
+    modal.innerHTML = `
+        <div class="secret-modal-content">
+            <div class="secret-modal-header">
+                <h3>🔒 Unlock Secret Subject</h3>
+                <button onclick="this.parentElement.parentElement.parentElement.remove()" class="close-secret-modal">×</button>
+            </div>
+            <div class="secret-modal-body">
+                <div class="secret-subject-info">
+                    <h4>${title}</h4>
+                    <p>This is an advanced secret subject that requires ${cost} Bytcoins to unlock.</p>
+                    <div class="cost-display">
+                        <span class="cost-label">Cost:</span>
+                        <span class="cost-amount">${cost} 🪙</span>
+                    </div>
+                    <div class="balance-display">
+                        <span class="balance-label">Your Balance:</span>
+                        <span class="balance-amount">${bytcoins} 🪙</span>
+                    </div>
+                </div>
+                <div class="secret-modal-actions">
+                    ${bytcoins >= cost ? 
+                        `<button class="unlock-btn" onclick="unlockSecretSubject('${subjectName}', ${cost})">🔓 Unlock for ${cost} Bytcoins</button>` :
+                        `<button class="unlock-btn disabled" disabled>❌ Insufficient Bytcoins (Need ${cost - bytcoins} more)</button>`
+                    }
+                    <button class="cancel-btn" onclick="this.parentElement.parentElement.parentElement.remove()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+    
+    document.body.appendChild(modal);
+}
+
+function unlockSecretSubject(subjectName, cost) {
+    if (spendBytcoins(cost)) {
+        // Add to unlocked subjects
+        unlockedSecretSubjects.push(subjectName);
+        localStorage.setItem('bytroxUnlockedSecrets', JSON.stringify(unlockedSecretSubjects));
+        
+        // Update the subject card
+        const subjectCard = document.querySelector(`[onclick="handleSecretSubject('${subjectName}')"]`);
+        subjectCard.classList.add('unlocked');
+        subjectCard.setAttribute('onclick', `startTutorial('${subjectName}')`);
+        
+        // Show success notification
+        showSecretUnlockNotification(subjectName);
+        
+        // Close modal
+        document.querySelector('.secret-modal').remove();
+        
+        // Start the tutorial
+        startTutorial(subjectName);
+    }
+}
+
+function showSecretUnlockNotification(subjectName) {
+    const subjectTitles = {
+        'password-cracking': 'Password Cracking',
+        'webcam-access': 'Webcam Access'
+    };
+    
+    const title = subjectTitles[subjectName] || subjectName;
+    
+    const notification = document.createElement('div');
+    notification.className = 'secret-unlock-notification';
+    notification.innerHTML = `
+        <div class="secret-notification-content">
+            <div class="secret-notification-icon">🔓</div>
+            <div class="secret-notification-text">
+                <div class="secret-notification-title">Secret Subject Unlocked!</div>
+                <div class="secret-notification-description">${title} is now available</div>
+            </div>
+        </div>
+    `;
+    
+    // Add notification styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 140px;
+        right: -400px;
+        z-index: 1001;
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        transition: right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        max-width: 350px;
+        font-weight: 600;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.right = '20px';
+    }, 100);
+    
+    // Animate out
+    setTimeout(() => {
+        notification.style.right = '-400px';
+        setTimeout(() => {
+            notification.remove();
+        }, 500);
+    }, 4000);
+}
+
+function initializeSecretSubjects() {
+    // Update unlocked secret subjects display
+    unlockedSecretSubjects.forEach(subjectName => {
+        const subjectCard = document.querySelector(`[onclick="handleSecretSubject('${subjectName}')"]`);
+        if (subjectCard) {
+            subjectCard.classList.add('unlocked');
+            subjectCard.setAttribute('onclick', `startTutorial('${subjectName}')`);
+        }
+    });
+}
+
+// Test function for secret subjects
+function testUnlockSecret(subjectName = 'password-cracking') {
+    if (bytcoins >= 500) {
+        unlockSecretSubject(subjectName, 500);
+        console.log(`Unlocked secret subject: ${subjectName}`);
+        return `Secret subject ${subjectName} unlocked!`;
+    } else {
+        console.log(`Not enough Bytcoins. Have: ${bytcoins}, Need: 500`);
+        return `Insufficient Bytcoins. Need 500, have ${bytcoins}`;
+    }
+}
+
+function resetSecretSubjects() {
+    unlockedSecretSubjects = [];
+    localStorage.setItem('bytroxUnlockedSecrets', JSON.stringify(unlockedSecretSubjects));
+    
+    // Reset all secret subject cards
+    document.querySelectorAll('.secret-subject').forEach(card => {
+        card.classList.remove('unlocked');
+        const subjectName = card.getAttribute('onclick').match(/'([^']+)'/)[1];
+        card.setAttribute('onclick', `handleSecretSubject('${subjectName}')`);
+    });
+    
+    console.log('All secret subjects locked again');
+    return 'Secret subjects reset successfully!';
+}
+
+// Code Redemption System
+let redeemedCodes = JSON.parse(localStorage.getItem('bytroxRedeemedCodes')) || [];
+
+const validCodes = {
+    'Daniel2013': {
+        reward: 100000,
+        description: 'Special Developer Code',
+        type: 'bytcoins'
+    }
+};
+
+function openRedeemCode() {
+    console.log('openRedeemCode() called'); // Debug log
+    
+    // Close the user dropdown
+    toggleUserProfile(); 
+    showRedeemCodeModal();
+}
+
+function showRedeemCodeModal() {
+    const modal = document.createElement('div');
+    modal.className = 'redeem-modal';
+    modal.innerHTML = `
+        <div class="redeem-modal-content">
+            <div class="redeem-modal-header">
+                <h3>🎁 Redeem Code</h3>
+                <button onclick="this.parentElement.parentElement.parentElement.remove()" class="close-redeem-modal">×</button>
+            </div>
+            <div class="redeem-modal-body">
+                <div class="redeem-info">
+                    <p>Enter a special code to claim rewards!</p>
+                    <div class="current-balance">
+                        <span class="balance-label">Current Balance:</span>
+                        <span class="balance-amount">${bytcoins} 🪙</span>
+                    </div>
+                </div>
+                <div class="code-input-section">
+                    <label for="redeem-code-input">Enter Code:</label>
+                    <input type="text" id="redeem-code-input" placeholder="Enter your code here..." maxlength="20">
+                    <div class="code-status" id="code-status"></div>
+                </div>
+                <div class="redeem-modal-actions">
+                    <button class="redeem-btn" onclick="redeemCode()">🎁 Redeem Code</button>
+                    <button class="cancel-btn" onclick="this.parentElement.parentElement.parentElement.remove()">Cancel</button>
+                </div>
+                <div class="redeem-history">
+                    <h4>Redeemed Codes:</h4>
+                    <div class="redeemed-list">
+                        ${redeemedCodes.length > 0 ? 
+                            redeemedCodes.map(code => `<div class="redeemed-item">✅ ${code}</div>`).join('') :
+                            '<div class="no-codes">No codes redeemed yet</div>'
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+    
+    document.body.appendChild(modal);
+    
+    // Focus on input field
+    setTimeout(() => {
+        document.getElementById('redeem-code-input').focus();
+    }, 100);
+    
+    // Add enter key support
+    document.getElementById('redeem-code-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            redeemCode();
+        }
+    });
+}
+
+function redeemCode() {
+    const input = document.getElementById('redeem-code-input');
+    const status = document.getElementById('code-status');
+    const code = input.value.trim();
+    
+    if (!code) {
+        showCodeStatus('Please enter a code', 'error');
+        return;
+    }
+    
+    // Check if code was already redeemed
+    if (redeemedCodes.includes(code)) {
+        showCodeStatus('Code already redeemed!', 'error');
+        return;
+    }
+    
+    // Check if code is valid
+    if (validCodes[code]) {
+        const codeData = validCodes[code];
+        
+        // Add to redeemed codes
+        redeemedCodes.push(code);
+        localStorage.setItem('bytroxRedeemedCodes', JSON.stringify(redeemedCodes));
+        
+        // Give reward
+        if (codeData.type === 'bytcoins') {
+            addBytcoins(codeData.reward);
+            showCodeStatus(`✅ Success! Earned ${codeData.reward} Bytcoins!`, 'success');
+            
+            // Update the balance display in the modal
+            setTimeout(() => {
+                const balanceAmount = document.querySelector('.redeem-modal .balance-amount');
+                if (balanceAmount) {
+                    balanceAmount.textContent = `${bytcoins} 🪙`;
+                }
+                
+                // Update redeemed list
+                const redeemedList = document.querySelector('.redeemed-list');
+                if (redeemedList) {
+                    redeemedList.innerHTML = redeemedCodes.map(code => 
+                        `<div class="redeemed-item">✅ ${code}</div>`
+                    ).join('');
+                }
+            }, 1000);
+            
+            // Show special notification
+            showCodeRedemptionNotification(code, codeData);
+            
+            // Clear input
+            input.value = '';
+        }
+    } else {
+        showCodeStatus('Invalid code. Please try again.', 'error');
+    }
+}
+
+function showCodeStatus(message, type) {
+    const status = document.getElementById('code-status');
+    status.textContent = message;
+    status.className = `code-status ${type}`;
+    status.style.display = 'block';
+    
+    setTimeout(() => {
+        status.style.display = 'none';
+    }, 3000);
+}
+
+function showCodeRedemptionNotification(code, codeData) {
+    const notification = document.createElement('div');
+    notification.className = 'code-redemption-notification';
+    notification.innerHTML = `
+        <div class="code-notification-content">
+            <div class="code-notification-icon">🎁</div>
+            <div class="code-notification-text">
+                <div class="code-notification-title">Code Redeemed!</div>
+                <div class="code-notification-description">${codeData.description}</div>
+                <div class="code-notification-reward">+${codeData.reward} Bytcoins!</div>
+            </div>
+        </div>
+    `;
+    
+    // Add notification styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 160px;
+        right: -400px;
+        z-index: 1001;
+        background: linear-gradient(135deg, #4ade80, #16a34a);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(74, 222, 128, 0.4);
+        transition: right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        max-width: 350px;
+        font-weight: 600;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.right = '20px';
+    }, 100);
+    
+    // Animate out
+    setTimeout(() => {
+        notification.style.right = '-400px';
+        setTimeout(() => {
+            notification.remove();
+        }, 500);
+    }, 5000);
+    
+    // Add celebration effect
+    createCelebrationEffect();
+}
+
+// Test function for code redemption
+function testRedeemCode(code = 'Daniel2013') {
+    if (redeemedCodes.includes(code)) {
+        console.log(`Code ${code} already redeemed`);
+        return `Code ${code} was already redeemed`;
+    }
+    
+    if (validCodes[code]) {
+        redeemedCodes.push(code);
+        localStorage.setItem('bytroxRedeemedCodes', JSON.stringify(redeemedCodes));
+        addBytcoins(validCodes[code].reward);
+        console.log(`Code ${code} redeemed successfully! Earned ${validCodes[code].reward} Bytcoins`);
+        return `Successfully redeemed ${code} for ${validCodes[code].reward} Bytcoins!`;
+    } else {
+        console.log(`Invalid code: ${code}`);
+        return `Invalid code: ${code}`;
+    }
+}
+
+function resetRedeemedCodes() {
+    redeemedCodes = [];
+    localStorage.setItem('bytroxRedeemedCodes', JSON.stringify(redeemedCodes));
+    console.log('All redeemed codes reset');
+    return 'Redeemed codes reset successfully!';
+}
+
+// Test function to verify redeem code modal works
+function testRedeemModal() {
+    console.log('Testing redeem modal...');
+    try {
+        openRedeemCode();
+        return 'Redeem modal test successful!';
+    } catch (error) {
+        console.error('Error opening redeem modal:', error);
+        return `Error: ${error.message}`;
+    }
 }
 
 function calculateLevel(experience) {
@@ -5912,8 +6593,14 @@ function showNotification(message, type = 'info') {
 }
 
 function closeAllModals() {
+    // Close standard modals
     document.querySelectorAll('.modal').forEach(modal => {
         modal.style.display = 'none';
+    });
+    
+    // Close custom modals
+    document.querySelectorAll('.secret-modal, .redeem-modal').forEach(modal => {
+        modal.remove();
     });
 }
 
@@ -6845,6 +7532,14 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
+
+// Initialize Bytcoins on window load as backup
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        syncBytcoinsData();
+        updateBytcoinsDisplay();
+    }, 100);
+});
 
 // Update achievements display with current progress
 function updateAchievementsDisplay() {
@@ -8087,6 +8782,17 @@ document.addEventListener('DOMContentLoaded', function() {
 function testAI() {
     console.log('Test function called');
     alert('AI Chat test - functions are working!');
+}
+
+// Missing functions for user dropdown menu
+function openProgress() {
+    console.log('Progress clicked');
+    alert('Progress feature coming soon!');
+}
+
+function openSettings() {
+    console.log('Settings clicked');
+    alert('Settings feature coming soon!');
 }
 
 /* ================= END FREE AI ASSISTANT SYSTEM ================== */

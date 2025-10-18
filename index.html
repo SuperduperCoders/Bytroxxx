@@ -19,17 +19,7 @@
     <!-- Critical CSS -->
     <link rel="stylesheet" href="styles.css">
     
-    <!-- Audio files for sound effects and background music -->
-    <!-- Note: Audio will use Web Audio API for synthetic sounds as fallback -->
-    <audio id="backgroundMusic" loop preload="none" style="display: none;">
-        <!-- External audio sources removed for better performance and reliability -->
-        <!-- Will use synthetic Web Audio API sounds instead -->
-    </audio>
-    
-    <audio id="clickSound" preload="none" style="display: none;">
-        <!-- External audio sources removed for better performance and reliability -->
-        <!-- Will use synthetic Web Audio API sounds instead -->
-    </audio>
+    <!-- Audio elements removed -->
     
     <!-- Optimized font loading -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -69,6 +59,11 @@
                 <a href="#ai-chat" class="nav-link">Bytrox AI</a>
                 <a href="#about" class="nav-link">About</a>
                 <div class="user-menu">
+                    <div class="bytcoins-container">
+                        <span class="bytcoins-icon">🪙</span>
+                        <span id="bytcoins-display">0</span>
+                        <span class="bytcoins-label">Bytcoins</span>
+                    </div>
                     <button class="user-profile-btn" onclick="toggleUserProfile()" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
                         <div class="user-avatar" id="user-avatar" aria-hidden="true">👤</div>
                         <span id="user-name">Guest</span>
@@ -76,6 +71,7 @@
                     <div class="user-dropdown" id="user-dropdown" style="display: none;" role="menu" aria-hidden="true">
                         <div class="dropdown-item" onclick="openProfile()" role="menuitem" tabindex="0">👤 Profile</div>
                         <div class="dropdown-item" onclick="openProgress()" role="menuitem" tabindex="0">📊 Progress</div>
+                        <div class="dropdown-item" onclick="openRedeemCode()" role="menuitem" tabindex="0">🎁 Redeem Code</div>
                         <div class="dropdown-item" onclick="openSettings()" role="menuitem" tabindex="0">⚙️ Settings</div>
                         <div class="dropdown-item" onclick="toggleTheme()" role="menuitem" tabindex="0">🌓 Toggle Theme</div>
                     </div>
@@ -346,6 +342,7 @@
                         <button class="filter-btn" data-filter="beginner" onclick="filterSubjects('beginner')">Beginner</button>
                         <button class="filter-btn" data-filter="intermediate" onclick="filterSubjects('intermediate')">Intermediate</button>
                         <button class="filter-btn" data-filter="advanced" onclick="filterSubjects('advanced')">Advanced</button>
+                        <button class="filter-btn secret-tab" data-filter="secret" onclick="filterSubjects('secret')">🔒 Secret</button>
                     </div>
                     <div class="sort-controls">
                         <select id="sort-subjects" onchange="sortSubjects()">
@@ -786,6 +783,47 @@
                         <div class="subject-meta">
                             <span class="steps-count">18 Steps</span>
                             <span class="time-estimate">~8 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Secret Subjects -->
+                    <div class="subject-card secret-subject" data-difficulty="secret" data-cost="500" onclick="handleSecretSubject('password-cracking')">
+                        <div class="subject-header">
+                            <div class="subject-icon">🔐</div>
+                            <div class="difficulty-badge secret">🔒 Secret</div>
+                        </div>
+                        <div class="secret-lock-overlay">
+                            <div class="lock-icon">🔒</div>
+                            <div class="unlock-cost">500 🪙</div>
+                        </div>
+                        <h3>Password Cracking</h3>
+                        <p>Advanced techniques for password recovery and analysis</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">25 Steps</span>
+                            <span class="time-estimate">~12 hours</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-progress="0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card secret-subject" data-difficulty="secret" data-cost="500" onclick="handleSecretSubject('webcam-access')">
+                        <div class="subject-header">
+                            <div class="subject-icon">📹</div>
+                            <div class="difficulty-badge secret">🔒 Secret</div>
+                        </div>
+                        <div class="secret-lock-overlay">
+                            <div class="lock-icon">🔒</div>
+                            <div class="unlock-cost">500 🪙</div>
+                        </div>
+                        <h3>Webcam Access</h3>
+                        <p>Ethical camera security testing and privacy protection</p>
+                        <div class="subject-meta">
+                            <span class="steps-count">20 Steps</span>
+                            <span class="time-estimate">~10 hours</span>
                         </div>
                         <div class="progress-bar">
                             <div class="progress-fill" data-progress="0"></div>

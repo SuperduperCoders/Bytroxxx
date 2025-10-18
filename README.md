@@ -28,6 +28,7 @@ Bytrox is a modern, interactive ethical hacking learning platform designed to pr
 - 📚 **200+ Interactive Steps** - Hands-on tutorials with practical examples
 - 🤖 **Built-in AI Assistant** - Free, offline AI support for learning
 - 🎮 **Gamified Learning** - Progress tracking, achievements, and challenges
+- 🪙 **Bytcoins Currency** - Earn 5 Bytcoins for each completed subject
 - 📱 **Mobile Responsive** - Learn anywhere, on any device
 - 🔊 **Audio Experience** - Optional sound effects and background music
 - 🎨 **Modern UI/UX** - Dark theme with smooth animations
@@ -150,7 +151,50 @@ Experience the full platform without any setup required!
 4. **Test Knowledge** - Built-in quizzes and challenges
 5. **Track Progress** - Monitor your advancement
 
-### 🤖 AI Assistant
+### � Bytcoins Currency System
+
+Bytrox features a built-in reward system called **Bytcoins**:
+
+- **Earn Bytcoins** - Receive 5 Bytcoins for each subject completed
+- **Visual Rewards** - Animated notifications and coin effects
+- **Progress Tracking** - Your Bytcoins are displayed in the header
+- **Persistent Storage** - Bytcoins are saved locally and persist between sessions
+
+**How to Earn:**
+1. Complete all steps in any subject tutorial
+2. Receive animated notification: "+5 Bytcoins Earned!"  
+3. Watch your balance grow in the header display
+4. **No duplicate rewards** - Each subject can only be completed once for Bytcoins
+5. **Code Redemption** - Enter special codes to claim bonus Bytcoins
+6. Track your progress through the gamified learning system
+
+**Code Redemption:**
+- Access via User Menu → 🎁 "Redeem Code"
+- Enter special promotional codes for bonus Bytcoins
+- Each code can only be used once per user
+- Redemption history is tracked and displayed
+
+**Visual Indicators:**
+- ✅ **Completion Badge** - Appears on completed subjects
+- 🌟 **Special Styling** - Completed subjects have enhanced visual design
+- 📊 **Progress Tracking** - Full progress bars for completed subjects
+
+### 🔒 Secret Subjects
+
+Unlock advanced content with your earned Bytcoins:
+
+- 🔐 **Password Cracking** - Cost: 500 Bytcoins
+- 📹 **Webcam Access** - Cost: 500 Bytcoins  
+
+**Access Requirements:**
+1. Navigate to the **🔒 Secret** tab in subjects
+2. Click on a locked subject to see unlock requirements
+3. Spend Bytcoins to permanently unlock advanced content
+4. **Ethical Use Only** - All content follows responsible disclosure principles
+
+The Bytcoins system encourages consistent learning and provides a sense of achievement as you master ethical hacking concepts!
+
+### �🤖 AI Assistant
 
 Ask the built-in AI assistant about:
 - Security concepts and definitions
@@ -164,6 +208,28 @@ Ask the built-in AI assistant about:
 - "How to use Nmap?"
 - "What is the OWASP Top 10?"
 - "Ethical hacking career path"
+
+### 🔊 Audio Experience
+
+Bytrox includes an immersive audio system to enhance your learning experience:
+
+- **Background Music** - Optional cyberpunk/synthwave atmosphere
+- **Sound Effects** - Click sounds and UI feedback
+- **Volume Controls** - Separate controls for music and SFX
+- **Custom Music Support** - Add your own MP3 files
+
+**Adding Custom Background Music:**
+1. Find a suitable MP3 file (cyberpunk/electronic recommended)
+2. Place it at `assets/music/track.mp3`
+3. Reload the page - the audio player will automatically detect it
+4. Use the floating audio button (🔊) to control playback
+
+**Recommended Music Sources:**
+- [Pixabay Music](https://pixabay.com/music/) (Free, no attribution required)
+- [Freesound](https://freesound.org/) (Filter by CC0 license)
+- Search for: "cyberpunk", "synthwave", "dark ambient"
+
+**Note:** Audio falls back to synthetic Web Audio API sounds if no MP3 is provided.
 
 ---
 
